@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Agent-Ready Checker</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; max-width: 700px; margin: 40px auto; padding: 0 20px; background: #f9fafb; color: #333; }
+        h1 { margin-bottom: 5px; }
+        p.subtitle { color: #666; margin-top: 0; margin-bottom: 30px; }
+        form { display: flex; gap: 10px; margin-bottom: 30px; }
+        input[type="text"] { flex: 1; padding: 12px; font-size: 16px; border: 1px solid #ccc; border-radius: 6px; outline: none; }
+        input[type="text"]:focus { border-color: #0070f3; box-shadow: 0 0 0 2px rgba(0,112,243,0.2); }
+        button { padding: 12px 24px; font-size: 16px; background: #0070f3; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        button:hover { background: #005bb5; }
+        .score-box { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 20px; text-align: center; }
+        .score-number { font-size: 48px; font-weight: bold; color: #0070f3; }
+        .check-list { list-style: none; padding: 0; }
+        .check-item { background: white; padding: 15px; margin-bottom: 8px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .pass { border-left: 4px solid #22c55e; }
+        .fail { border-left: 4px solid #ef4444; }
+        .error { background: #fee2e2; color: #b91c1c; padding: 15px; border-radius: 6px; margin-bottom: 20px; }
+        
+        /* Стили для бейджиков категорий */
+        .badge { padding: 2px 6px; border-radius: 4px; font-size: 11px; font-weight: bold; margin-left: 8px; vertical-align: middle; }
+        .badge-geo { background: #e0f2fe; color: #0369a1; }
+        .badge-agents { background: #f3e8ff; color: #7e22ce; }
+    </style>
+</head>
+<body>
+    <h1>Agent-Ready Checker</h1>
+    <p class="subtitle">Проверьте, готов ли ваш сайт к приходу AI-агентов и GEO-продвижению.</p>
+
+    <form method="POST">
+        <input type="text" name="url" placeholder="example.com" value="{{ request.form.url or '' }}" required>
+        <button type="submit">Проверить</button>
+    </form>
+
+    {% if error %}
+        <div class="error">{{ error }}</div>
+    {% endif %}
+
+    {% if result %}
+        <div class="score-box">
+            <div>Оценка готовности</div>
+            <div class="score-number">{{ result.score }} / 100</div>
+            <div style="color: #666; margin-top: 5px;">{{ result.url }}</div>
+        </div>
+
+        <ul class="check-list">
+            {% for item in result.results %}
+                <li class="check-item {{ 'pass' if item.exists else 'fail' }}">
+                    <span>
+                        {{ '✅' if item.exists else '❌' }} 
+                        {{ item.label }}
+                        {% if item.category == 'GEO' %}
+                            <span class="badge badge-geo">GEO</span>
+                        {% elif item.category == 'Агенты' %}
+                            <span class="badge badge-agents">Агенты</span>
+                        {% endif %}
+                    </span>
+                    <span style="color: #888;">+{{ item.weight }}</span>
+                </li>
+            {% endfor %}
+        </ul>
+
+        <!-- Легенда внизу -->
+        <div style="margin-top: 40px; padding: 15px; background: white; border-radius: 8px; font-size: 13px; color: #555; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+            <p style="margin-top: 0;"><strong>Что это значит?</strong></p>
+            <p style="margin-bottom: 5px;"><span style="color: #0369a1; font-weight: bold;">GEO (Generative Engine Optimization)</span> — проверки, которые помогают ChatGPT, Perplexity и Google AI Overviews найти ваш сайт и цитировать его в ответах.</p>
+            <p style="margin-bottom: 0;"><span style="color: #7e22ce; font-weight: bold;">Агенты</span> — технические файлы, которые позволяют AI-агентам не просто читать сайт, но и совершать на нем действия (например, заказывать товары или вызывать API).</p>
+        </div>
+    {% endif %}
+</body>
+</html>

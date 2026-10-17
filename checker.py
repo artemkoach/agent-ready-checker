@@ -1,0 +1,115 @@
+import requests
+from bs4 import BeautifulSoup
+from urllib.parse import urljoin
+
+# Список проверок: (ключ, путь, описание, вес в баллах, категория)
+CHECKS = [
+    # --- GEO (чтобы AI нашел и процитировал) ---
+    ("llms_txt", "/llms.txt", "llms.txt (карта для AI)", 20, "GEO"),
+    ("robots_ai", "/robots.txt", "robots.txt (правила для AI-ботов)", 15, "GEO"),
+    ("sitemap", "/sitemap.xml", "sitemap.xml (карта сайта)", 10, "GEO"),
+    
+    # --- Агенты (чтобы AI мог совершать действия) ---
+    ("agent_json", "/.well-known/agent.json", "agent.json (описание возможностей)", 15, "Агенты"),
+    ("mcp_json", "/.well-known/mcp.json", "mcp.json (MCP-эндпоинт)", 15, "Агенты"),
+    ("ai_plugin", "/.well-known/ai-plugin.json", "ai-plugin.json (старый стандарт)", 10, "Агенты"),
+    ("openapi", "/openapi.json", "openapi.json (API для агентов)", 5, "Агенты"),
+]
+
+# Расширенный список ключевых слов для поиска в robots.txt (11 самых популярных ботов)
+AI_BOT_KEYWORDS = [
+    "gptbot", "chatgpt-user", "claudebot", "anthropic-ai", 
+    "perplexitybot", "ccbot", "google-extended", 
+    "bytespider", "amazonbot", "applebot", "cohere-ai"
+]
+
+# Маскируемся под Chrome, чтобы сайты не блокировали
+HEADERS = {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"}
+
+
+def _fetch(url: str, timeout: int = 5):
+    """Пробует скачать URL. Возвращает текст или None, если не удалось."""
+    try:
+        resp = requests.get(url, headers=HEADERS, timeout=timeout, allow_redirects=True)
+        if resp.status_code == 200 and len(resp.text.strip()) > 20:
+            return resp.text
+    except requests.RequestException:
+        pass
+    return None
+
+
+def _check_robots_ai(base_url: str) -> bool:
+    """Проверяет, есть ли в robots.txt упоминания AI-ботов."""
+    text = _fetch(urljoin(base_url, "/robots.txt"))
+    if not text:
+        return False
+    lower = text.lower()
+    return any(bot in lower for bot in AI_BOT_KEYWORDS)
+
+
+def check_url(base_url: str) -> dict:
+    """Проверяет сайт по чек-листу. Возвращает результат со счётом 0-100."""
+    results = []
+    score = 0
+
+    for key, path, label, weight, category in CHECKS:
+        full_url = urljoin(base_url, path)
+
+        if key == "robots_ai":
+            exists = _check_robots_ai(base_url)
+        else:
+            exists = _fetch(full_url) is not None
+
+        if exists:
+            score += weight
+
+        results.append({
+            "key": key,
+            "label": label,
+            "exists": exists,
+            "url": full_url,
+            "weight": weight,
+            "category": category,
+        })
+
+    # Отдельная проверка: JSON-LD внутри HTML главной страницы
+    home_html = _fetch(base_url)
+    has_jsonld = False
+    if home_html:
+        soup = BeautifulSoup(home_html, "html.parser")
+        has_jsonld = soup.find("script", type="application/ld+json") is not None
+    if has_jsonld:
+        score += 10
+
+    results.append({
+        "key": "jsonld",
+        "label": "JSON-LD (структурированные данные)",
+        "exists": has_jsonld,
+        "url": base_url,
+        "weight": 10,
+        "category": "GEO",
+    })
+
+    return {
+        "url": base_url,
+        "score": score,
+        "results": results,
+    }
+
+
+# Этот блок срабатывает только при запуске файла напрямую:
+if __name__ == "__main__":
+    import sys
+
+    target = sys.argv[1] if len(sys.argv) > 1 else "https://openai.com"
+    if not target.startswith(("http://", "https://")):
+        target = "https://" + target
+
+    result = check_url(target)
+
+    print(f"\nПроверка: {result['url']}")
+    print(f"Оценка:   {result['score']} / 100\n")
+    for item in result["results"]:
+        mark = "✅" if item["exists"] else "❌"
+        print(f"  {mark} [{item['category']}] {item['label']}  (+{item['weight']})")
+    print()

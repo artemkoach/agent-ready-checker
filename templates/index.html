@@ -2,16 +2,30 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Agent-Ready Checker</title>
     <style>
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; max-width: 700px; margin: 40px auto; padding: 0 20px; background: #f9fafb; color: #333; }
         h1 { margin-bottom: 5px; }
-        p.subtitle { color: #666; margin-top: 0; margin-bottom: 30px; }
+        p.subtitle { color: #666; margin-top: 0; margin-bottom: 25px; font-size: 16px; }
+        
+        /* Блок с описанием */
+        .info-box { background: #e0f2fe; border-left: 4px solid #0284c7; padding: 15px 20px; border-radius: 6px; margin-bottom: 30px; font-size: 14px; line-height: 1.6; color: #0f172a; }
+        .info-box strong { color: #0369a1; }
+        
         form { display: flex; gap: 10px; margin-bottom: 30px; }
         input[type="text"] { flex: 1; padding: 12px; font-size: 16px; border: 1px solid #ccc; border-radius: 6px; outline: none; }
         input[type="text"]:focus { border-color: #0070f3; box-shadow: 0 0 0 2px rgba(0,112,243,0.2); }
-        button { padding: 12px 24px; font-size: 16px; background: #0070f3; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        
+        /* Кнопка и анимация загрузки */
+        button { padding: 12px 24px; font-size: 16px; background: #0070f3; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; display: flex; align-items: center; justify-content: center; min-width: 140px; transition: background 0.2s; }
         button:hover { background: #005bb5; }
+        button:disabled { background: #93c5fd; cursor: not-allowed; }
+        
+        .spinner { display: none; width: 18px; height: 18px; border: 3px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: white; animation: spin 1s ease-in-out infinite; margin-right: 8px; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Результаты */
         .score-box { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 20px; text-align: center; }
         .score-number { font-size: 48px; font-weight: bold; color: #0070f3; }
         .check-list { list-style: none; padding: 0; }
@@ -20,7 +34,6 @@
         .fail { border-left: 4px solid #ef4444; }
         .error { background: #fee2e2; color: #b91c1c; padding: 15px; border-radius: 6px; margin-bottom: 20px; }
         
-        /* Стили для бейджиков категорий */
         .badge { padding: 2px 6px; border-radius: 4px; font-size: 11px; font-weight: bold; margin-left: 8px; vertical-align: middle; }
         .badge-geo { background: #e0f2fe; color: #0369a1; }
         .badge-agents { background: #f3e8ff; color: #7e22ce; }
@@ -30,9 +43,17 @@
     <h1>Agent-Ready Checker</h1>
     <p class="subtitle">Проверьте, готов ли ваш сайт к приходу AI-агентов и GEO-продвижению.</p>
 
-    <form method="POST">
+    <!-- Блок с описанием -->
+    <div class="info-box">
+        <strong>Зачем это нужно?</strong> Нейросети (ChatGPT, Claude, Perplexity) уже ищут информацию в интернете. Чтобы они находили и цитировали ваш сайт, он должен быть к этому готов технически. Введите адрес сайта, чтобы узнать его оценку от 0 до 100 и получить список того, что нужно доработать.
+    </div>
+
+    <form method="POST" id="checker-form" onsubmit="showLoading()">
         <input type="text" name="url" placeholder="example.com" value="{{ request.form.url or '' }}" required>
-        <button type="submit">Проверить</button>
+        <button type="submit" id="submit-btn">
+            <span class="spinner" id="spinner"></span>
+            <span id="btn-text">Проверить</span>
+        </button>
     </form>
 
     {% if error %}
@@ -63,12 +84,26 @@
             {% endfor %}
         </ul>
 
-        <!-- Легенда внизу -->
         <div style="margin-top: 40px; padding: 15px; background: white; border-radius: 8px; font-size: 13px; color: #555; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
             <p style="margin-top: 0;"><strong>Что это значит?</strong></p>
             <p style="margin-bottom: 5px;"><span style="color: #0369a1; font-weight: bold;">GEO (Generative Engine Optimization)</span> — проверки, которые помогают ChatGPT, Perplexity и Google AI Overviews найти ваш сайт и цитировать его в ответах.</p>
             <p style="margin-bottom: 0;"><span style="color: #7e22ce; font-weight: bold;">Агенты</span> — технические файлы, которые позволяют AI-агентам не просто читать сайт, но и совершать на нем действия (например, заказывать товары или вызывать API).</p>
         </div>
     {% endif %}
+
+    <!-- JavaScript для анимации кнопки -->
+    <script>
+        function showLoading() {
+            // Находим элементы
+            const btn = document.getElementById('submit-btn');
+            const spinner = document.getElementById('spinner');
+            const btnText = document.getElementById('btn-text');
+            
+            // Меняем вид кнопки
+            btn.disabled = true;
+            spinner.style.display = 'inline-block';
+            btnText.textContent = 'Анализ...';
+        }
+    </script>
 </body>
 </html>

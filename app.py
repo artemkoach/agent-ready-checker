@@ -6,18 +6,17 @@ import zipfile
 
 app = Flask(__name__)
 
-# --- НАСТРОЙКА ПРОСТОГО СЧЕТЧИКА ---
-# Придумываем уникальное имя для нашего счетчика (можешь написать свое)
-COUNTER_NAMESPACE = "agent-ready-checker-artem"
-COUNTER_KEY = "total_checks"
-COUNTER_URL = f"https://api.counterapi.dev/v1/{COUNTER_NAMESPACE}/{COUNTER_KEY}"
+# Используем сервис Abacus для вечного счетчика
+COUNTER_NAME = "agentreadychecker"
+COUNTER_HIT_URL = f"https://abacus.jamesm.dev/hit/{COUNTER_NAME}"
+COUNTER_GET_URL = f"https://abacus.jamesm.dev/get/{COUNTER_NAME}"
 
 @app.route("/", methods=["GET", "POST"])
 def index():
     result = None
     error = None
     potential_gain = 0
-    current_total = 0 # Переменная для текущего значения счетчика
+    current_total = 0 
     
     if request.method == "POST":
         url = request.form.get("url", "").strip()
@@ -29,15 +28,14 @@ def index():
             try:
                 result = check_url(url)
                 
-                # Увеличиваем счетчик на внешнем сервисе CounterAPI
+                # Увеличиваем счетчик (hit)
                 try:
-                    res = requests.get(f"{COUNTER_URL}/up", timeout=3)
+                    res = requests.get(COUNTER_HIT_URL, timeout=5)
                     if res.status_code == 200:
-                        current_total = res.json().get("count", 0)
-                except Exception:
-                    pass # Если сервис недоступен, просто идем дальше
+                        current_total = res.json().get("value", 0)
+                except Exception as e:
+                    print(f"Counter error: {e}")
                 
-                # Считаем, сколько баллов можно получить за llms.txt и robots.txt
                 for item in result["results"]:
                     if item["key"] == "llms_txt" and not item["exists"]:
                         potential_gain += 20
@@ -46,13 +44,14 @@ def index():
             except Exception as e:
                 error = f"Не удалось проверить сайт: {e}"
     
-    # Если это просто заход на сайт (GET), читаем текущую цифру из CounterAPI
+    # Читаем текущее значение (если это просто заход на сайт)
     if not current_total:
         try:
-            res = requests.get(COUNTER_URL, timeout=3)
+            res = requests.get(COUNTER_GET_URL, timeout=5)
             if res.status_code == 200:
-                current_total = res.json().get("count", 0)
-        except Exception:
+                current_total = res.json().get("value", 0)
+        except Exception as e:
+            print(f"Counter read error: {e}")
             current_total = 0
             
     return render_template("index.html", result=result, error=error, total_checks=current_total, potential_gain=potential_gain)
@@ -64,18 +63,14 @@ def download_files():
     if not url:
         return "URL is required", 400
 
-    # Создаем ZIP-архив прямо в оперативной памяти
     memory_file = io.BytesIO()
     with zipfile.ZipFile(memory_file, 'w') as zf:
-        # Генерируем llms.txt
         llms_content = f"# LLMs.txt for {url}\n> This file helps AI models understand your site.\n\n## Main Pages\n- [Home]({url}): Main page"
         zf.writestr("llms.txt", llms_content)
         
-        # Генерируем robots.txt
         robots_content = "User-agent: GPTBot\nAllow: /\n\nUser-agent: ClaudeBot\nAllow: /\n\nUser-agent: PerplexityBot\nAllow: /\n\nUser-agent: *\nAllow: /"
         zf.writestr("robots.txt", robots_content)
         
-        # Пишем умную инструкцию в зависимости от CMS (движка сайта)
         if cms == "WordPress":
             instruction = f"Мы определили, что ваш сайт работает на WordPress.\n\n1. Зайдите в админку WordPress.\n2. Установите плагин 'File Manager'.\n3. Загрузите llms.txt и robots.txt в корневую папку сайта (туда, где лежит wp-config.php).\n4. Либо загрузите файлы через FTP (FileZilla) в ту же папку."
         elif cms == "Tilda":

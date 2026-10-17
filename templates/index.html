@@ -273,12 +273,17 @@
             }, 2000); // Меняем текст каждые 2 секунды
         }
 
-        // Отдельная функция загрузки при клике на скачивание архива
+                // Отдельная функция загрузки при клике на скачивание архива
         function showDownloadLoading() {
             const overlay = document.getElementById('loading-overlay');
             document.querySelector('.loading-title').textContent = "📦 Создаем архив...";
             document.getElementById('dynamic-loading-text').textContent = "ИИ генерирует файлы для вашего сайта...";
             overlay.classList.add('active');
+            
+            // Автоматически скрываем экран через 5 секунд (файл начнет скачиваться, а экран исчезнет)
+            setTimeout(() => {
+                overlay.classList.remove('active');
+            }, 5000);
         }
     </script>
 </body>

@@ -12,12 +12,25 @@ COUNTER_KEY = "total_checks"
 COUNTER_HIT_URL = f"https://tallywire.cronpulse.workers.dev/hit/{COUNTER_NAMESPACE}/{COUNTER_KEY}"
 COUNTER_GET_URL = f"https://tallywire.cronpulse.workers.dev/get/{COUNTER_NAMESPACE}/{COUNTER_KEY}"
 
+# --- ФУНКЦИЯ ЧЕСТНОЙ МАТЕМАТИКИ ---
+def get_conversion_lift(score: int) -> float:
+    """Честная консервативная оценка роста конверсии на основе нового балла."""
+    if score <= 30:
+        return 1.0
+    elif score <= 50:
+        return 1.5
+    elif score <= 70:
+        return 2.5
+    else:
+        return 4.0
+
 @app.route("/", methods=["GET", "POST"])
 def index():
     result = None
     error = None
     potential_gain = 0
     current_total = 0 
+    conversion_lift = 1.0 # Инициализируем по умолчанию
     
     if request.method == "POST":
         url = request.form.get("url", "").strip()
@@ -43,6 +56,11 @@ def index():
                         potential_gain += 20
                     if item["key"] == "robots_ai" and not item["exists"]:
                         potential_gain += 15
+                
+                # Считаем прогноз на основе будущего балла
+                new_score = result["score"] + potential_gain
+                conversion_lift = get_conversion_lift(new_score)
+                
             except Exception as e:
                 error = f"Не удалось проверить сайт: {e}"
     
@@ -56,7 +74,9 @@ def index():
             print(f"Counter read error: {e}")
             current_total = 0
             
-    return render_template("index.html", result=result, error=error, total_checks=current_total, potential_gain=potential_gain)
+    return render_template("index.html", result=result, error=error, 
+                           total_checks=current_total, potential_gain=potential_gain,
+                           conversion_lift=conversion_lift)
 
 @app.route("/download-files")
 def download_files():

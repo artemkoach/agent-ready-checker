@@ -20,6 +20,9 @@
     </script>
 
     <style>
+        /* Глобальный сброс, чтобы отступы не ломали ширину */
+        * { box-sizing: border-box; }
+
         /* Применяем строгий шрифт Inter ко всему сайту */
         body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; max-width: 700px; margin: 40px auto; padding: 0 20px; background: #f9fafb; color: #1f2937; line-height: 1.5; }
         
@@ -82,7 +85,8 @@
         .growth-label { font-size: 12px; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; margin-top: 4px; }
         .growth-arrow { font-size: 24px; color: #d97706; }
 
-        .download-btn { display: inline-flex; align-items: center; gap: 8px; padding: 16px 32px; background: #d97706; color: white; text-decoration: none; font-size: 16px; font-weight: 600; border-radius: 8px; box-shadow: 0 4px 6px rgba(217, 119, 6, 0.3); transition: all 0.2s; border: none; width: 100%; justify-content: center; }
+        /* Исправленная кнопка (без width: 100%) */
+        .download-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 16px 32px; background: #d97706; color: white; text-decoration: none; font-size: 16px; font-weight: 600; border-radius: 8px; box-shadow: 0 4px 6px rgba(217, 119, 6, 0.3); transition: all 0.2s; border: none; width: auto; }
         .download-btn:hover { background: #b45309; transform: translateY(-2px); box-shadow: 0 6px 12px rgba(217, 119, 6, 0.4); }
     </style>
 </head>
@@ -122,40 +126,51 @@
             <div style="color: #9ca3af; margin-top: 5px; font-size: 14px;">{{ result.url }}</div>
         </div>
 
-        <!-- БЛОК ИСТОРИИ УСПЕХА (Storytelling) -->
+        <!-- БЛОК ИСТОРИИ УСПЕХА (Честная математика и список ИИ) -->
         {% if potential_gain > 0 %}
         <div class="story-box anim-pop">
-            <h3 class="story-title">🚀 Как увеличить поток клиентов в 10 раз?</h3>
+            <h3 class="story-title">🚀 Как AI-поисковики помогут вам получать больше клиентов</h3>
             
             <p class="story-text">
-                Прямо сейчас нейросети <strong>не понимают ваш сайт</strong> и рекомендуют конкурентов. Вы теряете потенциальных клиентов, которые ищут ваши услуги через ChatGPT и Perplexity.
+                Нейросети — <strong>ChatGPT, Perplexity, Claude, Gemini, Copilot, DeepSeek, Grok</strong> и другие — уже рекомендуют сайты пользователям. Но они делают это только для тех сайтов, которые технически готовы к диалогу.
             </p>
             
             <p class="story-text">
-                Представьте: если сейчас вас находят <strong>100 человек</strong> в день. Добавив наши файлы, нейросети начнут цитировать вас в ответах. Уже через месяц ваш трафик может выглядеть так:
+                Сейчас ваш балл — <strong>{{ result.score }}</strong>. Это значит, что AI-поисковики видят вас ограниченно. Если вы добавите наши файлы, ваш балл вырастет до <strong>{{ result.score + potential_gain }}</strong>.
             </p>
 
-            <!-- Визуализация роста -->
+            <!-- Визуализация роста (Баллы, а не фейковые иксы) -->
             <div class="growth-visual">
                 <div class="growth-before">
-                    <div class="growth-num">100</div>
-                    <div class="growth-label">Сейчас</div>
+                    <div class="growth-num">{{ result.score }}</div>
+                    <div class="growth-label">Балл сейчас</div>
                 </div>
                 <div class="growth-arrow">➔</div>
                 <div class="growth-after">
-                    <!-- Высчитываем потенциальный рост (например, умножаем на 10 для наглядности) -->
-                    <div class="growth-num new">{{ result.score + potential_gain }}x</div>
-                    <div class="growth-label">Потенциал</div>
+                    <div class="growth-num new">{{ result.score + potential_gain }}</div>
+                    <div class="growth-label">Новый балл</div>
                 </div>
             </div>
 
-            <p class="story-text" style="font-size: 14px; font-style: italic; text-align: center; margin-bottom: 20px;">
-                Эти файлы — ваша «визитка» для AI. Они объяснят нейросетям, что вы — авторитетный источник.
+            <!-- Честные метрики -->
+            <div style="background: rgba(255,255,255,0.6); padding: 15px; border-radius: 8px; margin: 15px 0; font-size: 14px;">
+                <p style="margin: 0 0 8px 0; font-weight: 600; color: #92400e;">📈 Что это даёт на практике:</p>
+                <ul style="margin: 0; padding-left: 20px; color: #78350f;">
+                    <li><strong>Качество лидов:</strong> прогнозируемый рост конверсии в <strong>{{ conversion_lift }}x</strong> раз(а), так как посетители из AI уже готовы к покупке.</li>
+                    <li><strong>Бесплатный трафик:</strong> нейросети начнут цитировать вас в ответах на вопросы пользователей.</li>
+                </ul>
+            </div>
+
+            <p class="story-text" style="font-size: 13px; font-style: italic; text-align: center; margin-bottom: 20px;">
+                *Прогноз основан на медианных данных рынка. Реальный рост зависит от вашего контента.
             </p>
 
-            <a href="/download-files?url={{ result.url }}&cms={{ result.cms }}" class="download-btn">
-                📥 Скачать пакет для AI (ZIP)
-            </a>
+            <!-- Кнопка отцентрирована и не вылезает за рамки -->
+            <div style="text-align: center;">
+                <a href="/download-files?url={{ result.url }}&cms={{ result.cms }}" class="download-btn">
+                    📥 Скачать пакет для AI (ZIP)
+                </a>
+            </div>
             <p style="color: #92400e; font-size: 12px; margin-top: 12px; text-align: center; font-weight: 500;">Инструкция по установке уже внутри архива</p>
         </div>
         {% endif %}

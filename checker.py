@@ -1,34 +1,29 @@
 import requests
 from bs4 import BeautifulSoup
-from urllib.parse import urljoin
+from urllib.parse import urljoin, urlparse
+import sys
 
 # Список проверок: (ключ, путь, описание, вес в баллах, категория)
 CHECKS = [
-    # --- GEO (чтобы AI нашел и процитировал) ---
     ("llms_txt", "/llms.txt", "llms.txt (карта для AI)", 20, "GEO"),
     ("robots_ai", "/robots.txt", "robots.txt (правила для AI-ботов)", 15, "GEO"),
     ("sitemap", "/sitemap.xml", "sitemap.xml (карта сайта)", 10, "GEO"),
-    
-    # --- Агенты (чтобы AI мог совершать действия) ---
     ("agent_json", "/.well-known/agent.json", "agent.json (описание возможностей)", 15, "Агенты"),
     ("mcp_json", "/.well-known/mcp.json", "mcp.json (MCP-эндпоинт)", 15, "Агенты"),
     ("ai_plugin", "/.well-known/ai-plugin.json", "ai-plugin.json (старый стандарт)", 10, "Агенты"),
     ("openapi", "/openapi.json", "openapi.json (API для агентов)", 5, "Агенты"),
 ]
 
-# Расширенный список ключевых слов для поиска в robots.txt
 AI_BOT_KEYWORDS = [
     "gptbot", "chatgpt-user", "claudebot", "anthropic-ai", 
     "perplexitybot", "ccbot", "google-extended", 
     "bytespider", "amazonbot", "applebot", "cohere-ai"
 ]
 
-# Маскируемся под Chrome, чтобы сайты не блокировали
 HEADERS = {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"}
 
-
-def _fetch(url: str, timeout: int = 5):
-    """Пробует скачать URL. Возвращает текст или None, если не удалось."""
+def _fetch(url: str, timeout: int = 3): 
+    """Пробует скачать URL. Возвращает текст или None."""
     try:
         resp = requests.get(url, headers=HEADERS, timeout=timeout, allow_redirects=True)
         if resp.status_code == 200 and len(resp.text.strip()) > 20:
@@ -36,7 +31,6 @@ def _fetch(url: str, timeout: int = 5):
     except requests.RequestException:
         pass
     return None
-
 
 def _check_robots_ai(base_url: str) -> bool:
     """Проверяет, есть ли в robots.txt упоминания AI-ботов."""
@@ -46,15 +40,38 @@ def _check_robots_ai(base_url: str) -> bool:
     lower = text.lower()
     return any(bot in lower for bot in AI_BOT_KEYWORDS)
 
+def _extract_links(html: str, base_url: str) -> list:
+    """Собирает внутренние ссылки с главной страницы для умного llms.txt"""
+    soup = BeautifulSoup(html, "html.parser")
+    domain = urlparse(base_url).netloc
+    links = []
+    seen = set()
+
+    for a in soup.find_all("a", href=True):
+        href = a["href"]
+        if href.startswith("#") or href.startswith("javascript:") or href.startswith("mailto:"):
+            continue
+        
+        full_url = urljoin(base_url, href)
+        parsed = urlparse(full_url)
+        
+        if parsed.netloc == domain and full_url not in seen:
+            seen.add(full_url)
+            if len(links) < 15:
+                text = a.get_text(strip=True) or "Страница"
+                text = " ".join(text.split())[:50] 
+                links.append(f"- [{text}]({full_url})")
+
+    return links
 
 def check_url(base_url: str) -> dict:
-    """Проверяет сайт по чек-листу. Возвращает результат со счётом 0-100."""
+    """Проверяет сайт по чек-листу и собирает данные для llms.txt."""
     results = []
     score = 0
+    extracted_links = []
 
     for key, path, label, weight, category in CHECKS:
         full_url = urljoin(base_url, path)
-
         if key == "robots_ai":
             exists = _check_robots_ai(base_url)
         else:
@@ -64,24 +81,18 @@ def check_url(base_url: str) -> dict:
             score += weight
 
         results.append({
-            "key": key,
-            "label": label,
-            "exists": exists,
-            "url": full_url,
-            "weight": weight,
-            "category": category,
+            "key": key, "label": label, "exists": exists,
+            "url": full_url, "weight": weight, "category": category,
         })
 
-    # Отдельная проверка: JSON-LD + определение CMS
     home_html = _fetch(base_url)
     has_jsonld = False
-    cms = "Unknown"  # По умолчанию неизвестно
+    cms = "Unknown"
     
     if home_html:
         soup = BeautifulSoup(home_html, "html.parser")
         has_jsonld = soup.find("script", type="application/ld+json") is not None
         
-        # Умное определение движка сайта по коду
         html_lower = home_html.lower()
         if "wp-content" in html_lower or "wordpress" in html_lower:
             cms = "WordPress"
@@ -93,31 +104,28 @@ def check_url(base_url: str) -> dict:
             cms = "Shopify"
         elif "wix.com" in html_lower:
             cms = "Wix"
+            
+        extracted_links = _extract_links(home_html, base_url)
 
     if has_jsonld:
         score += 10
 
     results.append({
-        "key": "jsonld",
-        "label": "JSON-LD (структурированные данные)",
-        "exists": has_jsonld,
-        "url": base_url,
-        "weight": 10,
-        "category": "GEO",
+        "key": "jsonld", "label": "JSON-LD (структурированные данные)",
+        "exists": has_jsonld, "url": base_url, "weight": 10, "category": "GEO",
     })
 
     return {
         "url": base_url,
         "score": score,
-        "cms": cms,  # <-- Теперь передаем движок в app.py
+        "cms": cms,
+        "links": extracted_links,
         "results": results,
     }
 
 
-# Этот блок срабатывает только при запуске файла напрямую:
+# Этот блок нужен для проверки через терминал (python checker.py site.com)
 if __name__ == "__main__":
-    import sys
-
     target = sys.argv[1] if len(sys.argv) > 1 else "https://openai.com"
     if not target.startswith(("http://", "https://")):
         target = "https://" + target
@@ -126,7 +134,9 @@ if __name__ == "__main__":
 
     print(f"\nПроверка: {result['url']}")
     print(f"Оценка:   {result['score']} / 100")
-    print(f"Движок:   {result['cms']}\n") # Выводим движок в консоль
+    print(f"Движок:   {result['cms']}")
+    print(f"Найдено ссылок для llms.txt: {len(result['links'])}\n")
+    
     for item in result["results"]:
         mark = "✅" if item["exists"] else "❌"
         print(f"  {mark} [{item['category']}] {item['label']}  (+{item['weight']})")

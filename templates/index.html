@@ -129,7 +129,9 @@
             </p>
             
             <p class="story-text">
-                Сейчас ваш балл — <strong>{{ result.score }}</strong>. Это значит, что AI-поисковики видят вас ограниченно. Если вы добавите недостающие файлы из нашего архива, ваш балл вырастет до <strong>{{ result.score + potential_gain }}</strong>.
+                Сейчас ваш технический балл — <strong>{{ result.score }}</strong>. Это значит, что AI-поисковики видят вас ограниченно. Если вы добавите файлы из нашего архива, он вырастет до <strong>{{ result.score + potential_gain }}</strong>. 
+                <br><br>
+                <em style="font-size: 13px;">Мы уже проанализировали структуру вашего сайта и положили в архив <strong>умный llms.txt</strong> с реальной картой ваших страниц.</em>
             </p>
 
             <div class="growth-visual">
@@ -147,16 +149,16 @@
             <div style="background: rgba(255,255,255,0.6); padding: 15px; border-radius: 8px; margin: 15px 0; font-size: 14px;">
                 <p style="margin: 0 0 8px 0; font-weight: 600; color: #92400e;">📈 Что это даёт на практике:</p>
                 <ul style="margin: 0; padding-left: 20px; color: #78350f;">
-                    <li><strong>Прогноз конверсии:</strong> благодаря AI-трафику, показатель вырастет в <strong>{{ conversion_lift }}x</strong> раз(а).</li>
+                    <li><strong>Прогноз конверсии:</strong> в перспективе до <strong>{{ conversion_lift }}x</strong> раз(а) (при условии качественного контента на сайте).</li>
                     
                     {% set new_score = result.score + potential_gain %}
                     
                     {% if new_score >= 71 %}
-                        <li><strong>Статус для AI:</strong> «Авторитетный источник». Нейросети будут активно цитировать вас в ответах, приводя «горячих» клиентов, которые уже готовы к покупке.</li>
+                        <li><strong>Статус для AI:</strong> «Авторитетный источник». Нейросети будут активно цитировать вас в ответах, приводя «горячих» клиентов.</li>
                     {% elif new_score >= 31 %}
-                        <li><strong>Статус для AI:</strong> «Понятный сайт». ChatGPT и Perplexity начнут регулярно считывать ваш контент и иногда рекомендовать вас пользователям.</li>
+                        <li><strong>Статус для AI:</strong> «Понятный сайт». ChatGPT и Perplexity начнут регулярно считывать ваш контент и иногда рекомендовать вас.</li>
                     {% else %}
-                        <li><strong>Статус для AI:</strong> «Базовый доступ». Вы перестанете быть «белым пятном» для нейросетей. Они начнут видеть ваш сайт и постепенно изучать его.</li>
+                        <li><strong>Статус для AI:</strong> «Базовый доступ». Вы перестанете быть «белым пятном» для нейросетей. Они начнут видеть ваш сайт.</li>
                     {% endif %}
                 </ul>
             </div>
@@ -170,7 +172,7 @@
                     📥 Скачать пакет для AI (ZIP)
                 </a>
             </div>
-            <p style="color: #92400e; font-size: 12px; margin-top: 12px; text-align: center; font-weight: 500;">Внутри архива: все файлы + инструкция</p>
+            <p style="color: #92400e; font-size: 12px; margin-top: 12px; text-align: center; font-weight: 500;">Внутри архива: все файлы + инструкция под ваш движок</p>
         </div>
         {% else %}
         <div class="success-box anim-pop">

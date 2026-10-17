@@ -1,229 +1,134 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Agent-Ready Checker</title>
+import requests
+from flask import Flask, render_template, request, send_file
+from checker import check_url, _fetch, _extract_links
+import io
+import zipfile
+
+app = Flask(__name__)
+
+# --- НАСТРОЙКА РАБОЧЕГО СЧЕТЧИКА TALLYWIRE ---
+COUNTER_NAMESPACE = "agent-ready-checker-artem"
+COUNTER_KEY = "total_checks"
+COUNTER_HIT_URL = f"https://tallywire.cronpulse.workers.dev/hit/{COUNTER_NAMESPACE}/{COUNTER_KEY}"
+COUNTER_GET_URL = f"https://tallywire.cronpulse.workers.dev/get/{COUNTER_NAMESPACE}/{COUNTER_KEY}"
+
+# --- ФУНКЦИЯ ПЛАВНОЙ МАТЕМАТИКИ ---
+def get_conversion_lift(score: int) -> float:
+    """Плавная оценка роста конверсии в зависимости от балла."""
+    return round(1.0 + (score / 100.0) * 3.0, 1)
+
+@app.route("/", methods=["GET", "POST"])
+def index():
+    result = None
+    error = None
+    potential_gain = 0
+    current_total = 0 
+    conversion_lift = 1.0
     
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
-
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-6SGJ9KLN8W"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-6SGJ9KLN8W');
-    </script>
-
-    <style>
-        * { box-sizing: border-box; }
-        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; max-width: 700px; margin: 40px auto; padding: 0 20px; background: #f9fafb; color: #1f2937; line-height: 1.5; }
-        
-        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes popIn { 0% { opacity: 0; transform: scale(0.9); } 100% { opacity: 1; transform: scale(1); } }
-        @keyframes glow { 0% { box-shadow: 0 0 0 0 rgba(234, 179, 8, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(234, 179, 8, 0); } 100% { box-shadow: 0 0 0 0 rgba(234, 179, 8, 0); } }
-        
-        .anim-fade { animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; }
-        .anim-pop { animation: popIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; }
-        .delay-1 { animation-delay: 0.1s; }
-        .delay-2 { animation-delay: 0.2s; }
-        
-        h1 { margin-bottom: 5px; font-weight: 700; letter-spacing: -0.02em; }
-        p.subtitle { color: #6b7280; margin-top: 0; margin-bottom: 25px; font-size: 16px; font-weight: 400; }
-        
-        .info-box { background: #eff6ff; border-left: 4px solid #3b82f6; padding: 15px 20px; border-radius: 6px; margin-bottom: 30px; font-size: 14px; line-height: 1.6; color: #1e3a8a; }
-        .info-box strong { color: #1d4ed8; }
-        
-        form { display: flex; gap: 10px; margin-bottom: 30px; }
-        input[type="text"] { flex: 1; padding: 12px 16px; font-size: 16px; font-family: 'Inter', sans-serif; border: 1px solid #d1d5db; border-radius: 8px; outline: none; transition: all 0.2s; }
-        input[type="text"]:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.15); transform: translateY(-1px); }
-        
-        button { padding: 12px 24px; font-size: 16px; font-family: 'Inter', sans-serif; background: #2563eb; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; display: flex; align-items: center; justify-content: center; min-width: 140px; transition: all 0.2s; box-shadow: 0 2px 4px rgba(37,99,235,0.2); }
-        button:hover:not(:disabled) { background: #1d4ed8; transform: translateY(-1px); box-shadow: 0 4px 8px rgba(37,99,235,0.3); }
-        button:active:not(:disabled) { transform: translateY(1px); box-shadow: 0 1px 2px rgba(37,99,235,0.2); }
-        button:disabled { background: #93c5fd; cursor: not-allowed; box-shadow: none; }
-        
-        .spinner { display: none; width: 18px; height: 18px; border: 3px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: white; animation: spin 1s ease-in-out infinite; margin-right: 8px; }
-        @keyframes spin { to { transform: rotate(360deg); } }
-
-        .score-box { background: white; padding: 30px 20px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.04); margin-bottom: 25px; text-align: center; border: 1px solid #f3f4f6; }
-        .score-number { font-family: 'Playfair Display', serif; font-size: 64px; font-weight: 700; color: #111827; line-height: 1; margin: 10px 0; }
-        .score-out-of { font-size: 24px; color: #9ca3af; font-weight: 600; font-family: 'Inter', sans-serif; }
-        
-        .check-list { list-style: none; padding: 0; }
-        .check-item { background: white; padding: 16px 20px; margin-bottom: 8px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 1px 3px rgba(0,0,0,0.04); transition: transform 0.2s, box-shadow 0.2s; border: 1px solid transparent; }
-        .check-item:hover { transform: translateX(4px); box-shadow: 0 4px 12px rgba(0,0,0,0.06); border-color: #e5e7eb; }
-        
-        .pass { border-left: 4px solid #10b981; }
-        .fail { border-left: 4px solid #ef4444; }
-        .error { background: #fef2f2; color: #991b1b; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #fecaca; }
-        
-        .badge { padding: 3px 8px; border-radius: 6px; font-size: 11px; font-weight: 600; margin-left: 8px; vertical-align: middle; letter-spacing: 0.05em; text-transform: uppercase; }
-        .badge-geo { background: #e0f2fe; color: #0369a1; }
-        .badge-agents { background: #f3e8ff; color: #7e22ce; }
-
-        .story-box { background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%); border: 1px solid #fcd34d; padding: 30px; border-radius: 12px; margin-bottom: 25px; box-shadow: 0 10px 25px -5px rgba(251, 191, 36, 0.2); position: relative; overflow: hidden; }
-        .story-title { font-weight: 700; color: #92400e; font-size: 20px; margin-top: 0; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; }
-        .story-text { color: #78350f; font-size: 15px; line-height: 1.6; margin-bottom: 20px; }
-        
-        .growth-visual { display: flex; align-items: center; justify-content: center; gap: 20px; margin: 20px 0; background: rgba(255,255,255,0.6); padding: 15px; border-radius: 8px; }
-        .growth-before { text-align: center; }
-        .growth-after { text-align: center; }
-        .growth-num { font-size: 24px; font-weight: 700; color: #9ca3af; }
-        .growth-num.new { color: #059669; font-size: 32px; animation: glow 2s infinite; border-radius: 8px; padding: 0 10px; }
-        .growth-label { font-size: 12px; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; margin-top: 4px; }
-        .growth-arrow { font-size: 24px; color: #d97706; }
-
-        .download-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 16px 32px; background: #d97706; color: white; text-decoration: none; font-size: 16px; font-weight: 600; border-radius: 8px; box-shadow: 0 4px 6px rgba(217, 119, 6, 0.3); transition: all 0.2s; border: none; width: auto; }
-        .download-btn:hover { background: #b45309; transform: translateY(-2px); box-shadow: 0 6px 12px rgba(217, 119, 6, 0.4); }
-
-        .success-box { background: #ecfdf5; border: 1px solid #6ee7b7; padding: 30px; border-radius: 12px; margin-bottom: 25px; text-align: center; box-shadow: 0 4px 6px rgba(16, 185, 129, 0.1); }
-        .success-title { color: #065f46; font-size: 20px; font-weight: 700; margin-top: 0; margin-bottom: 10px; }
-        .success-text { color: #047857; font-size: 15px; line-height: 1.5; }
-    </style>
-</head>
-<body>
-    <div class="anim-fade" style="text-align: right; font-size: 13px; color: #9ca3af; margin-bottom: 10px; font-weight: 500;">
-        Всего проверок сделано: <strong style="color: #2563eb;">{{ total_checks }}</strong>
-    </div>
-
-    <div class="anim-fade">
-        <h1>Agent-Ready Checker</h1>
-        <p class="subtitle">Проверьте, готов ли ваш сайт к приходу AI-агентов и GEO-продвижению.</p>
-    </div>
-
-    <div class="info-box anim-fade delay-1">
-        <strong>Зачем это нужно?</strong> Нейросети (ChatGPT, Claude, Perplexity) уже ищут информацию в интернете. Чтобы они находили и цитировали ваш сайт, он должен быть к этому готов технически. Введите адрес сайта, чтобы узнать его оценку от 0 до 100 и получить список того, что нужно доработать.
-    </div>
-
-    <form method="POST" id="checker-form" onsubmit="showLoading()" class="anim-fade delay-2">
-        <input type="text" name="url" placeholder="example.com" value="{{ request.form.url or '' }}" required>
-        <button type="submit" id="submit-btn">
-            <span class="spinner" id="spinner"></span>
-            <span id="btn-text">Проверить</span>
-        </button>
-    </form>
-
-    {% if error %}
-        <div class="error anim-pop">{{ error }}</div>
-    {% endif %}
-
-    {% if result %}
-        <div class="score-box anim-pop">
-            <div style="font-size: 14px; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600;">Оценка готовности</div>
-            <div>
-                <span class="score-number">{{ result.score }}</span>
-                <span class="score-out-of">/ 100</span>
-            </div>
-            <div style="color: #9ca3af; margin-top: 5px; font-size: 14px;">{{ result.url }}</div>
-        </div>
-
-        {% if potential_gain > 0 %}
-        <div class="story-box anim-pop">
-            <h3 class="story-title">🚀 Как AI-поисковики помогут вам получать больше клиентов</h3>
+    if request.method == "POST":
+        url = request.form.get("url", "").strip()
+        if not url:
+            error = "Введите URL сайта"
+        else:
+            if not url.startswith(("http://", "https://")):
+                url = "https://" + url
+            try:
+                result = check_url(url)
+                
+                # Увеличиваем счетчик
+                try:
+                    res = requests.get(COUNTER_HIT_URL, timeout=5)
+                    if res.status_code == 200:
+                        current_total = res.json().get("value", 0)
+                except Exception as e:
+                    print(f"Counter hit error: {e}")
+                
+                # Считаем баллы за ВСЕ файлы, которые мы можем дать в архиве
+                target_keys = ["llms_txt", "robots_ai", "agent_json", "mcp_json", "ai_plugin", "openapi", "jsonld"]
+                for item in result["results"]:
+                    if item["key"] in target_keys and not item["exists"]:
+                        potential_gain += item["weight"]
+                
+                # Считаем прогноз конверсии
+                new_score = result["score"] + potential_gain
+                conversion_lift = get_conversion_lift(new_score)
+                
+            except Exception as e:
+                error = f"Не удалось проверить сайт: {e}"
+    
+    # Читаем текущее значение
+    if not current_total:
+        try:
+            res = requests.get(COUNTER_GET_URL, timeout=5)
+            if res.status_code == 200:
+                current_total = res.json().get("value", 0)
+        except Exception as e:
+            print(f"Counter read error: {e}")
+            current_total = 0
             
-            <p class="story-text">
-                Нейросети — <strong>ChatGPT, Perplexity, Claude, Gemini, Copilot, DeepSeek, Grok</strong> и другие — уже рекомендуют сайты пользователям. Но они делают это только для тех сайтов, которые технически готовы к диалогу.
-            </p>
-            
-            <p class="story-text">
-                Сейчас ваш балл — <strong>{{ result.score }}</strong>. Это значит, что AI-поисковики видят вас ограниченно. Если вы добавите недостающие файлы из нашего архива, ваш балл вырастет до <strong>{{ result.score + potential_gain }}</strong>.
-            </p>
+    return render_template("index.html", result=result, error=error, 
+                           total_checks=current_total, potential_gain=potential_gain,
+                           conversion_lift=conversion_lift)
 
-            <div class="growth-visual">
-                <div class="growth-before">
-                    <div class="growth-num">{{ result.score }}</div>
-                    <div class="growth-label">Балл сейчас</div>
-                </div>
-                <div class="growth-arrow">➔</div>
-                <div class="growth-after">
-                    <div class="growth-num new">{{ result.score + potential_gain }}</div>
-                    <div class="growth-label">Новый балл</div>
-                </div>
-            </div>
+@app.route("/download-files")
+def download_files():
+    url = request.args.get("url", "")
+    cms = request.args.get("cms", "Unknown")
+    if not url:
+        return "URL is required", 400
 
-            <div style="background: rgba(255,255,255,0.6); padding: 15px; border-radius: 8px; margin: 15px 0; font-size: 14px;">
-                <p style="margin: 0 0 8px 0; font-weight: 600; color: #92400e;">📈 Что это даёт на практике:</p>
-                <ul style="margin: 0; padding-left: 20px; color: #78350f;">
-                    <li><strong>Прогноз конверсии:</strong> благодаря AI-трафику, показатель вырастет в <strong>{{ conversion_lift }}x</strong> раз(а).</li>
-                    
-                    {% set new_score = result.score + potential_gain %}
-                    
-                    {% if new_score >= 71 %}
-                        <li><strong>Статус для AI:</strong> «Авторитетный источник». Нейросети будут активно цитировать вас в ответах, приводя «горячих» клиентов, которые уже готовы к покупке.</li>
-                    {% elif new_score >= 31 %}
-                        <li><strong>Статус для AI:</strong> «Понятный сайт». ChatGPT и Perplexity начнут регулярно считывать ваш контент и иногда рекомендовать вас пользователям.</li>
-                    {% else %}
-                        <li><strong>Статус для AI:</strong> «Базовый доступ». Вы перестанете быть «белым пятном» для нейросетей. Они начнут видеть ваш сайт и постепенно изучать его.</li>
-                    {% endif %}
-                </ul>
-            </div>
+    # --- УМНЫЙ ПАРСИНГ ССЫЛОК ДЛЯ llms.txt ---
+    # Делаем повторный запрос к сайту, чтобы собрать реальные ссылки
+    home_html = _fetch(url)
+    links = _extract_links(home_html, url) if home_html else [f"- [Главная]({url}): Главная страница"]
 
-            <p class="story-text" style="font-size: 13px; font-style: italic; text-align: center; margin-bottom: 20px;">
-                *Прогноз основан на медианных данных рынка. Реальный рост зависит от вашего контента.
-            </p>
+    memory_file = io.BytesIO()
+    with zipfile.ZipFile(memory_file, 'w') as zf:
+        # 1. УМНЫЙ llms.txt (с реальными ссылками из меню)
+        llms_content = f"# LLMs.txt for {url}\n> This file helps AI models understand your site structure.\n\n## Main Pages\n"
+        llms_content += "\n".join(links)
+        zf.writestr("llms.txt", llms_content)
+        
+        # 2. robots.txt
+        robots_content = "User-agent: GPTBot\nAllow: /\n\nUser-agent: ClaudeBot\nAllow: /\n\nUser-agent: PerplexityBot\nAllow: /\n\nUser-agent: *\nAllow: /"
+        zf.writestr("robots.txt", robots_content)
 
-            <div style="text-align: center;">
-                <a href="/download-files?url={{ result.url }}&cms={{ result.cms }}" class="download-btn">
-                    📥 Скачать пакет для AI (ZIP)
-                </a>
-            </div>
-            <p style="color: #92400e; font-size: 12px; margin-top: 12px; text-align: center; font-weight: 500;">Внутри архива: все файлы + инструкция</p>
-        </div>
-        {% else %}
-        <div class="success-box anim-pop">
-            <h3 class="success-title">🎉 Поздравляем! Ваш сайт полностью готов к AI</h3>
-            <p class="success-text">
-                У вас уже есть все необходимые технические файлы для нейросетей (ChatGPT, Perplexity, Claude и других). Они могут беспрепятственно читать ваш сайт и цитировать его в своих ответах.
-            </p>
-            <p class="success-text" style="margin-top: 15px; font-size: 13px; opacity: 0.8;">
-                Скачивать дополнительные файлы не требуется. Вы огромные молодцы!
-            </p>
-        </div>
-        {% endif %}
+        # 3. agent.json (Пока шаблон, заменим на ИИ на следующем этапе)
+        agent_json = '{\n  "name": "Your Agent Name",\n  "description": "Description of your agent",\n  "url": "' + url + '",\n  "capabilities": ["read", "search"]\n}'
+        zf.writestr("agent.json", agent_json)
 
-        <ul class="check-list">
-            {% for item in result.results %}
-                <li class="check-item {{ 'pass' if item.exists else 'fail' }}" style="animation: fadeInUp 0.4s ease-out forwards; opacity: 0; animation-delay: {{ loop.index0 * 0.08 }}s;">
-                    <span style="font-weight: 500;">
-                        {{ '✅' if item.exists else '❌' }} 
-                        {{ item.label }}
-                        {% if item.category == 'GEO' %}
-                            <span class="badge badge-geo">GEO</span>
-                        {% elif item.category == 'Агенты' %}
-                            <span class="badge badge-agents">Агенты</span>
-                        {% endif %}
-                    </span>
-                    <span style="color: #9ca3af; font-weight: 600;">+{{ item.weight }}</span>
-                </li>
-            {% endfor %}
-        </ul>
+        # 4. mcp.json
+        mcp_json = '{\n  "mcpServers": {\n    "default": {\n      "command": "npx",\n      "args": ["-y", "@modelcontextprotocol/server-everything"]\n    }\n  }\n}'
+        zf.writestr("mcp.json", mcp_json)
 
-        <div class="anim-fade" style="animation-delay: {{ result.results|length * 0.08 }}s; margin-top: 40px; padding: 20px; background: white; border-radius: 12px; font-size: 14px; color: #4b5563; box-shadow: 0 2px 10px rgba(0,0,0,0.03);">
-            <p style="margin-top: 0; font-weight: 700; color: #111827; font-size: 16px;">Что это значит?</p>
-            <p style="margin-bottom: 10px;"><span style="color: #0369a1; font-weight: 700;">GEO (Generative Engine Optimization)</span> — проверки, которые помогают ChatGPT, Perplexity и Google AI Overviews найти ваш сайт и цитировать его в ответах.</p>
-            <p style="margin-bottom: 0;"><span style="color: #7e22ce; font-weight: 700;">Агенты</span> — технические файлы, которые позволяют AI-агентам не просто читать сайт, но и совершать на нем действия (например, заказывать товары или вызывать API).</p>
-        </div>
-    {% endif %}
+        # 5. ai-plugin.json
+        ai_plugin = '{\n  "schema_version": "v1",\n  "name_for_human": "Your Plugin",\n  "description_for_human": "Description",\n  "auth": { "type": "none" }\n}'
+        zf.writestr("ai-plugin.json", ai_plugin)
 
-    <div style="text-align: center; margin-top: 50px; margin-bottom: 30px;">
-        <a href="https://github.com/artemkoach/agent-ready-checker" target="_blank" style="display: inline-flex; align-items: center; gap: 8px; color: #6b7280; text-decoration: none; font-size: 14px; font-weight: 500; padding: 10px 20px; border-radius: 8px; background: white; box-shadow: 0 1px 3px rgba(0,0,0,0.05); transition: all 0.2s; border: 1px solid #e5e7eb;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.08)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 1px 3px rgba(0,0,0,0.05)'">
-            <svg height="20" width="20" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path></svg>
-            Смотреть исходный код на GitHub
-        </a>
-    </div>
+        # 6. openapi.json
+        openapi = '{\n  "openapi": "3.0.0",\n  "info": { "title": "API", "version": "1.0.0" },\n  "paths": {}\n}'
+        zf.writestr("openapi.json", openapi)
 
-    <script>
-        function showLoading() {
-            const btn = document.getElementById('submit-btn');
-            const spinner = document.getElementById('spinner');
-            const btnText = document.getElementById('btn-text');
-            btn.disabled = true;
-            spinner.style.display = 'inline-block';
-            btnText.textContent = 'Анализ...';
-        }
-    </script>
-</body>
-</html>
+        # 7. JSON-LD инструкция
+        jsonld_instruction = 'Для получения баллов за JSON-LD, скопируйте этот код и вставьте его в тег <head> на вашей главной странице:\n\n<script type="application/ld+json">\n{\n  "@context": "https://schema.org",\n  "@type": "WebSite",\n  "name": "Your Site Name",\n  "url": "' + url + '"\n}\n</script>'
+        zf.writestr("JSON-LD_ИНСТРУКЦИЯ.txt", jsonld_instruction)
+        
+        # 8. README (Инструкция под CMS)
+        if cms == "WordPress":
+            instruction = f"Мы определили, что ваш сайт работает на WordPress.\n\n1. Зайдите в админку WordPress.\n2. Установите плагин 'File Manager'.\n3. Загрузите все файлы (кроме JSON-LD_ИНСТРУКЦИЯ) в корневую папку сайта.\n4. Для JSON-LD: вставьте код из инструкции в header вашей темы."
+        elif cms == "Tilda":
+            instruction = f"Мы определили, что ваш сайт работает на Tilda.\n\n1. Зайдите в настройки сайта на Tilda.\n2. Перейдите в раздел 'Ещё' -> 'Файлы'.\n3. Загрузите туда все файлы (кроме JSON-LD_ИНСТРУКЦИЯ).\n4. Для JSON-LD: вставьте код из файла в настройках страницы."
+        elif cms == "1C-Bitrix":
+            instruction = f"Мы определили, что ваш сайт работает на 1С-Битрикс.\n\n1. Зайдите в админку Битрикса.\n2. Перейдите в раздел 'Контент' -> 'Структура сайта'.\n3. Загрузите файлы в корневую директорию.\n4. Для JSON-LD: вставьте код из инструкции в header."
+        elif cms == "Shopify":
+            instruction = f"Мы определили, что ваш сайт работает на Shopify.\n\n1. Зайдите в админку Shopify.\n2. Перейдите в раздел 'Интернет-магазин' -> 'Темы'.\n3. Нажмите 'Действия' -> 'Редактировать код' -> 'Добавить новый актив'.\n4. Загрузите файлы.\n5. Для JSON-LD: вставьте код из инструкции в theme.liquid перед </head>."
+        else:
+            instruction = f"Инструкция для {url}:\n1. Распакуйте архив.\n2. Загрузите все файлы (кроме JSON-LD_ИНСТРУКЦИЯ) в корень вашего сайта через FTP.\n3. Для JSON-LD: откройте файл с инструкцией и вставьте код в <head> главной страницы."
+        
+        zf.writestr("README_ИНСТРУКЦИЯ.txt", instruction)
+    
+    memory_file.seek(0)
+    return send_file(memory_file, download_name="ai-ready-files.zip", as_attachment=True)
+
+if __name__ == "__main__":
+    app.run(debug=True)

@@ -115,6 +115,10 @@ def check_url(base_url: str) -> dict:
         "exists": has_jsonld, "url": base_url, "weight": 10, "category": "GEO",
     })
 
+    # ФОЛБЭК: Если ссылок не найдено, добавляем главную, чтобы sitemap не был пустым
+    if not extracted_links:
+        extracted_links = [f"- [Главная]({base_url}): Главная страница"]
+
     return {
         "url": base_url,
         "score": score,

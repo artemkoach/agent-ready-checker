@@ -103,6 +103,13 @@ def download_files():
             soup = BeautifulSoup(home_html, "html.parser")
             site_text = soup.get_text(separator=' ', strip=True)[:2000]
             
+            # Умный фолбэк для сайтов на JavaScript
+            if len(site_text) < 50:
+                page_title = soup.title.string if soup.title else ""
+                meta_desc = soup.find("meta", attrs={"name": "description"})
+                desc_text = meta_desc["content"] if meta_desc else ""
+                site_text = f"Название: {page_title}. Описание: {desc_text}"
+            
             prompt = f"""
             Проанализируй текст сайта: "{site_text}" (URL: {url}).
             Сгенерируй 4 документа:

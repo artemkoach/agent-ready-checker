@@ -48,7 +48,8 @@ def index():
                 except Exception:
                     pass
                 
-                target_keys = ["llms_txt", "robots_ai", "agent_json", "mcp_json", "ai_plugin", "openapi", "jsonld"]
+                # Считаем потенциал только за те файлы, которые реально даем
+                target_keys = ["llms_txt", "robots_ai", "agent_json", "ai_plugin"]
                 for item in result["results"]:
                     if item["key"] in target_keys and not item["exists"]:
                         potential_gain += item["weight"]
@@ -117,7 +118,6 @@ def download_files():
             ai_data = json.loads(response.choices[0].message.content)
             
             if "agent_json" in ai_data:
-                # Если ИИ вернул словарь (dict), превращаем в строку. Если строку - оставляем как есть.
                 if isinstance(ai_data["agent_json"], dict):
                     agent_json_content = json.dumps(ai_data["agent_json"], ensure_ascii=False, indent=2)
                 else:

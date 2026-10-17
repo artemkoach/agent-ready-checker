@@ -138,38 +138,35 @@
 
         {% if potential_gain > 0 %}
         <div class="story-box anim-pop">
-            <h3 class="story-title">Как AI-поисковики помогут вам получать больше клиентов</h3>
+            <h3 class="story-title">🚀 Как AI-поисковики помогут вам получать больше клиентов</h3>
             
             <p class="story-text">
                 Нейросети — <strong>ChatGPT, Perplexity, Claude, Gemini, Copilot, DeepSeek, Grok</strong> и другие — уже рекомендуют сайты пользователям. Но они делают это только для тех сайтов, которые технически готовы к диалогу.
             </p>
             
             <p class="story-text">
-                Сейчас ваш технический балл — <strong>{{ result.score }}</strong>. Это значит, что AI-поисковики видят вас ограниченно. Если вы добавите файлы из нашего архива, ситуация изменится.
+                Сейчас ваш технический балл — <strong>{{ result.score }}</strong>. Это значит, что AI-поисковики видят вас ограниченно. Если вы добавите файлы из нашего архива, он вырастет до <strong>{{ result.score + potential_gain }}</strong>. 
+                <br><br>
+                <em style="font-size: 13px;">ИИ уже проанализировал ваш сайт и сгенерировал уникальные файлы (agent.json и llms.txt) специально под ваш бизнес.</em>
             </p>
 
-            <!-- МАТЕМАТИЧЕСКАЯ МОДЕЛЬ В ДЕЙСТВИИ -->
-            <div style="background: rgba(255,255,255,0.6); padding: 20px; border-radius: 8px; margin: 20px 0;">
-                <div style="text-align: center; margin-bottom: 15px; font-weight: 600; color: #92400e;">Рост вашей оценки:</div>
-                <div style="display: flex; align-items: center; justify-content: center; gap: 20px;">
-                    <div style="text-align: center;">
-                        <div style="font-size: 12px; color: #6b7280; text-transform: uppercase; font-weight: 600; margin-bottom: 5px;">Сейчас</div>
-                        <div style="font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 700; color: #9ca3af; line-height: 1;">{{ result.score }}</div>
-                    </div>
-                    <div style="font-size: 24px; color: #d97706;">➔</div>
-                    <div style="text-align: center;">
-                        <div style="font-size: 12px; color: #6b7280; text-transform: uppercase; font-weight: 600; margin-bottom: 5px;">С нашими файлами</div>
-                        <div style="font-family: 'Playfair Display', serif; font-size: 48px; font-weight: 700; color: #059669; line-height: 1;">{{ result.score + potential_gain }} <span style="font-size: 20px; color: #9ca3af;">/ 100</span></div>
-                    </div>
+            <div class="growth-visual">
+                <div class="growth-before">
+                    <div class="growth-num">{{ result.score }}</div>
+                    <div class="growth-label">Балл сейчас</div>
                 </div>
-                <div style="text-align: center; margin-top: 15px; padding-top: 15px; border-top: 1px dashed #fcd34d; font-size: 15px; color: #78350f;">
-                    Прогноз роста конверсии в AI-поиске: <strong style="color: #059669; font-size: 18px;">{{ conversion_lift }}x</strong>
+                <div class="growth-arrow">➔</div>
+                <div class="growth-after">
+                    <div class="growth-num new">{{ result.score + potential_gain }}</div>
+                    <div class="growth-label">Новый балл</div>
                 </div>
             </div>
 
             <div style="background: rgba(255,255,255,0.6); padding: 15px; border-radius: 8px; margin: 15px 0; font-size: 14px;">
                 <p style="margin: 0 0 8px 0; font-weight: 600; color: #92400e;">📈 Что это даёт на практике:</p>
                 <ul style="margin: 0; padding-left: 20px; color: #78350f;">
+                    <li><strong>Прогноз конверсии:</strong> в перспективе до <strong>{{ conversion_lift }}x</strong> раз(а) (при условии качественного контента на сайте).</li>
+                    
                     {% set new_score = result.score + potential_gain %}
                     
                     {% if new_score >= 71 %}

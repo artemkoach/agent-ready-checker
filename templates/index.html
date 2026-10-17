@@ -61,7 +61,6 @@
         .badge-geo { background: #e0f2fe; color: #0369a1; }
         .badge-agents { background: #f3e8ff; color: #7e22ce; }
 
-        /* Новые бейджики статуса */
         .badge-status { padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 700; margin-left: 6px; text-transform: uppercase; letter-spacing: 0.05em; border: 1px solid transparent; vertical-align: middle; }
         .status-ready { background: #d1fae5; color: #065f46; border-color: #a7f3d0; }
         .status-template { background: #fef3c7; color: #92400e; border-color: #fde68a; }
@@ -86,29 +85,16 @@
         .success-title { color: #065f46; font-size: 20px; font-weight: 700; margin-top: 0; margin-bottom: 10px; }
         .success-text { color: #047857; font-size: 15px; line-height: 1.5; }
 
-        /* --- СТИЛИ ДЛЯ ЭКРАНА ЗАГРУЗКИ --- */
-        .loading-overlay {
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            background: rgba(249, 250, 251, 0.95);
-            backdrop-filter: blur(8px);
-            display: none; flex-direction: column; align-items: center; justify-content: center;
-            z-index: 9999; opacity: 0; transition: opacity 0.3s ease;
-        }
+        .loading-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(249, 250, 251, 0.95); backdrop-filter: blur(8px); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; opacity: 0; transition: opacity 0.3s ease; }
         .loading-overlay.active { display: flex; opacity: 1; }
-        
-        .ai-spinner {
-            width: 60px; height: 60px; border: 5px solid #e5e7eb; border-top-color: #2563eb;
-            border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 25px;
-        }
+        .ai-spinner { width: 60px; height: 60px; border: 5px solid #e5e7eb; border-top-color: #2563eb; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 25px; }
         @keyframes spin { to { transform: rotate(360deg); } }
-        
         .loading-title { font-size: 24px; font-weight: 700; color: #111827; margin-bottom: 10px; }
         .loading-dynamic { font-size: 16px; color: #4b5563; font-weight: 500; height: 24px; margin-bottom: 20px; }
         .loading-note { font-size: 13px; color: #9ca3af; max-width: 300px; text-align: center; line-height: 1.4; }
     </style>
 </head>
 <body>
-    <!-- ЭКРАН ЗАГРУЗКИ -->
     <div id="loading-overlay" class="loading-overlay">
         <div class="ai-spinner"></div>
         <div class="loading-title">🤖 Нейросеть работает</div>
@@ -202,7 +188,7 @@
                     📥 Скачать пакет для AI (ZIP)
                 </a>
             </div>
-            <p style="color: #92400e; font-size: 12px; margin-top: 12px; text-align: center; font-weight: 500;">Внутри архива: умные файлы от ИИ + инструкция под ваш движок</p>
+            <p style="color: #92400e; font-size: 12px; margin-top: 12px; text-align: center; font-weight: 500;">Внутри архива: умные файлы + инструкция под ваш движок</p>
         </div>
         {% else %}
         <div class="success-box anim-pop">
@@ -230,15 +216,12 @@
                             <span class="badge badge-agents">Агенты</span>
                         {% endif %}
 
-                        <!-- ЧЕСТНЫЕ СТАТУСЫ -->
-                        {% if item.key in ['llms_txt', 'agent_json', 'ai_plugin'] %}
-                            <span class="badge-status status-ready" title="Этот файл сгенерирован ИИ под ваш сайт и полностью готов">ГОТОВЫЙ ФАЙЛ </span>
-                        
-                        {% elif item.key == 'robots_ai' %}
-                            <span class="badge-status status-ready" title="Стандартный файл, полностью готов">ГОТОВЫЙ ФАЙЛ</span>
+                        <!-- ФИНАЛЬНАЯ ЛОГИКА СТАТУСОВ -->
+                        {% if item.key in ['llms_txt', 'agent_json', 'ai_plugin', 'robots_ai'] %}
+                            <span class="badge-status status-ready" title="Этот файл полностью готов к работе">ГОТОВЫЙ ФАЙЛ</span>
                         
                         {% elif item.key == 'jsonld' %}
-                            <span class="badge-status status-ready" title="ИИ написал готовый код. Осталось скопировать его из инструкции на сайт">КОД + ИНСТРУКЦИЯ</span>
+                            <span class="badge-status status-ready" title="В архиве лежит готовый код, который нужно вставить на сайт">КОД + ИНСТРУКЦИЯ</span>
                         
                         {% else %}
                             <span class="badge-status status-dev" title="Мы работаем над генерацией этого файла">В РАЗРАБОТКЕ</span>

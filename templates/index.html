@@ -213,14 +213,11 @@
                         {% if item.key in ['llms_txt', 'agent_json', 'ai_plugin', 'robots_ai', 'sitemap', 'llms_full'] %}
                             <span class="badge-status status-ready" title="Этот файл полностью готов к работе">ГОТОВЫЙ ФАЙЛ</span>
                         
-                        {% elif item.key == 'jsonld' %}
+                        {% elif item.key in ['jsonld', 'meta_desc', 'open_graph', 'canonical', 'faq_schema'] %}
                             <span class="badge-status status-ready" title="В архиве лежит готовый код, который нужно вставить на сайт">КОД + ИНСТРУКЦИЯ</span>
                         
-                        {% elif item.key in ['mcp_json', 'openapi'] %}
-                            <span class="badge-status status-dev" title="Мы работаем над генерацией этого файла">В РАЗРАБОТКЕ</span>
-                            
                         {% else %}
-                            <span class="badge-status status-template" title="Мы проверяем наличие этого на сайте">ПРОВЕРКА</span>
+                            <span class="badge-status status-dev" title="Мы работаем над этим">В РАЗРАБОТКЕ</span>
                         {% endif %}
 
                     </span>

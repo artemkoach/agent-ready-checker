@@ -16,7 +16,7 @@ CHECKS = [
     ("openapi", "/openapi.json", "openapi.json (API для агентов)", 5, "Агенты"),
 ]
 
-# Расширенный список ключевых слов для поиска в robots.txt (11 самых популярных ботов)
+# Расширенный список ключевых слов для поиска в robots.txt
 AI_BOT_KEYWORDS = [
     "gptbot", "chatgpt-user", "claudebot", "anthropic-ai", 
     "perplexitybot", "ccbot", "google-extended", 
@@ -72,12 +72,28 @@ def check_url(base_url: str) -> dict:
             "category": category,
         })
 
-    # Отдельная проверка: JSON-LD внутри HTML главной страницы
+    # Отдельная проверка: JSON-LD + определение CMS
     home_html = _fetch(base_url)
     has_jsonld = False
+    cms = "Unknown"  # По умолчанию неизвестно
+    
     if home_html:
         soup = BeautifulSoup(home_html, "html.parser")
         has_jsonld = soup.find("script", type="application/ld+json") is not None
+        
+        # Умное определение движка сайта по коду
+        html_lower = home_html.lower()
+        if "wp-content" in html_lower or "wordpress" in html_lower:
+            cms = "WordPress"
+        elif "tilda" in html_lower:
+            cms = "Tilda"
+        elif "bitrix" in html_lower:
+            cms = "1C-Bitrix"
+        elif "shopify" in html_lower:
+            cms = "Shopify"
+        elif "wix.com" in html_lower:
+            cms = "Wix"
+
     if has_jsonld:
         score += 10
 
@@ -93,6 +109,7 @@ def check_url(base_url: str) -> dict:
     return {
         "url": base_url,
         "score": score,
+        "cms": cms,  # <-- Теперь передаем движок в app.py
         "results": results,
     }
 
@@ -108,7 +125,8 @@ if __name__ == "__main__":
     result = check_url(target)
 
     print(f"\nПроверка: {result['url']}")
-    print(f"Оценка:   {result['score']} / 100\n")
+    print(f"Оценка:   {result['score']} / 100")
+    print(f"Движок:   {result['cms']}\n") # Выводим движок в консоль
     for item in result["results"]:
         mark = "✅" if item["exists"] else "❌"
         print(f"  {mark} [{item['category']}] {item['label']}  (+{item['weight']})")

@@ -68,6 +68,11 @@
     </style>
 </head>
 <body>
+    <!-- Глобальный счетчик проверок -->
+    <div class="anim-fade" style="text-align: right; font-size: 13px; color: #888; margin-bottom: 10px;">
+        Всего проверок сделано: <strong style="color: #0070f3;">{{ total_checks }}</strong>
+    </div>
+
     <div class="anim-fade">
         <h1>Agent-Ready Checker</h1>
         <p class="subtitle">Проверьте, готов ли ваш сайт к приходу AI-агентов и GEO-продвижению.</p>
@@ -95,6 +100,18 @@
             <div class="score-number">{{ result.score }} / 100</div>
             <div style="color: #666; margin-top: 5px;">{{ result.url }}</div>
         </div>
+
+        <!-- Желтый блок с предсказанием улучшения и кнопкой скачивания -->
+        {% if potential_gain > 0 %}
+        <div class="anim-pop" style="background: #fef08a; border: 1px solid #eab308; padding: 20px; border-radius: 8px; margin-bottom: 20px; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+            <h3 style="margin-top: 0; color: #854d0e;">🚀 Сделайте сайт эффективнее!</h3>
+            <p style="color: #713f12;">Если вы добавите наши готовые файлы, оценка вырастет на <strong>+{{ potential_gain }} баллов</strong>!</p>
+            <p style="color: #713f12;">Новая оценка составит: <strong>{{ result.score + potential_gain }} / 100</strong>.</p>
+            <a href="/download-files?url={{ result.url }}&cms={{ result.cms }}" style="display: inline-flex; align-items: center; gap: 8px; margin-top: 10px; padding: 12px 24px; background: #eab308; color: #422006; text-decoration: none; font-weight: bold; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); transition: background 0.2s;" onmouseover="this.style.background='#ca8a04'" onmouseout="this.style.background='#eab308'">
+                📥 Скачать готовые файлы (ZIP)
+            </a>
+        </div>
+        {% endif %}
 
         <ul class="check-list">
             {% for item in result.results %}

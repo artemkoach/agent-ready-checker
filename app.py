@@ -6,10 +6,11 @@ import zipfile
 
 app = Flask(__name__)
 
-# Используем сервис Abacus для вечного счетчика
-COUNTER_NAME = "agentreadychecker"
-COUNTER_HIT_URL = f"https://abacus.jamesm.dev/hit/{COUNTER_NAME}"
-COUNTER_GET_URL = f"https://abacus.jamesm.dev/get/{COUNTER_NAME}"
+# --- НАСТРОЙКА РАБОЧЕГО СЧЕТЧИКА TALLYWIRE ---
+COUNTER_NAMESPACE = "agent-ready-checker-artem"
+COUNTER_KEY = "total_checks"
+COUNTER_HIT_URL = f"https://tallywire.cronpulse.workers.dev/hit/{COUNTER_NAMESPACE}/{COUNTER_KEY}"
+COUNTER_GET_URL = f"https://tallywire.cronpulse.workers.dev/get/{COUNTER_NAMESPACE}/{COUNTER_KEY}"
 
 @app.route("/", methods=["GET", "POST"])
 def index():
@@ -28,14 +29,15 @@ def index():
             try:
                 result = check_url(url)
                 
-                # Увеличиваем счетчик (hit)
+                # Увеличиваем счетчик (Hit)
                 try:
                     res = requests.get(COUNTER_HIT_URL, timeout=5)
                     if res.status_code == 200:
                         current_total = res.json().get("value", 0)
                 except Exception as e:
-                    print(f"Counter error: {e}")
+                    print(f"Counter hit error: {e}")
                 
+                # Считаем, сколько баллов можно получить за llms.txt и robots.txt
                 for item in result["results"]:
                     if item["key"] == "llms_txt" and not item["exists"]:
                         potential_gain += 20
@@ -44,7 +46,7 @@ def index():
             except Exception as e:
                 error = f"Не удалось проверить сайт: {e}"
     
-    # Читаем текущее значение (если это просто заход на сайт)
+    # Читаем текущее значение (если это просто заход на сайт или если счетчик не вернул значение при POST)
     if not current_total:
         try:
             res = requests.get(COUNTER_GET_URL, timeout=5)
@@ -63,14 +65,18 @@ def download_files():
     if not url:
         return "URL is required", 400
 
+    # Создаем ZIP-архив прямо в оперативной памяти
     memory_file = io.BytesIO()
     with zipfile.ZipFile(memory_file, 'w') as zf:
+        # Генерируем llms.txt
         llms_content = f"# LLMs.txt for {url}\n> This file helps AI models understand your site.\n\n## Main Pages\n- [Home]({url}): Main page"
         zf.writestr("llms.txt", llms_content)
         
+        # Генерируем robots.txt
         robots_content = "User-agent: GPTBot\nAllow: /\n\nUser-agent: ClaudeBot\nAllow: /\n\nUser-agent: PerplexityBot\nAllow: /\n\nUser-agent: *\nAllow: /"
         zf.writestr("robots.txt", robots_content)
         
+        # Пишем умную инструкцию в зависимости от CMS (движка сайта)
         if cms == "WordPress":
             instruction = f"Мы определили, что ваш сайт работает на WordPress.\n\n1. Зайдите в админку WordPress.\n2. Установите плагин 'File Manager'.\n3. Загрузите llms.txt и robots.txt в корневую папку сайта (туда, где лежит wp-config.php).\n4. Либо загрузите файлы через FTP (FileZilla) в ту же папку."
         elif cms == "Tilda":

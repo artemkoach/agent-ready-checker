@@ -20,13 +20,9 @@
     </script>
 
     <style>
-        /* Глобальный сброс, чтобы отступы не ломали ширину */
         * { box-sizing: border-box; }
-
-        /* Применяем строгий шрифт Inter ко всему сайту */
         body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; max-width: 700px; margin: 40px auto; padding: 0 20px; background: #f9fafb; color: #1f2937; line-height: 1.5; }
         
-        /* --- АНИМАЦИИ --- */
         @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes popIn { 0% { opacity: 0; transform: scale(0.9); } 100% { opacity: 1; transform: scale(1); } }
         @keyframes glow { 0% { box-shadow: 0 0 0 0 rgba(234, 179, 8, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(234, 179, 8, 0); } 100% { box-shadow: 0 0 0 0 rgba(234, 179, 8, 0); } }
@@ -55,8 +51,6 @@
         @keyframes spin { to { transform: rotate(360deg); } }
 
         .score-box { background: white; padding: 30px 20px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.04); margin-bottom: 25px; text-align: center; border: 1px solid #f3f4f6; }
-        
-        /* Применяем шикарный шрифт Playfair Display к цифре */
         .score-number { font-family: 'Playfair Display', serif; font-size: 64px; font-weight: 700; color: #111827; line-height: 1; margin: 10px 0; }
         .score-out-of { font-size: 24px; color: #9ca3af; font-weight: 600; font-family: 'Inter', sans-serif; }
         
@@ -72,7 +66,7 @@
         .badge-geo { background: #e0f2fe; color: #0369a1; }
         .badge-agents { background: #f3e8ff; color: #7e22ce; }
 
-        /* Стили для блока истории успеха */
+        /* Желтый блок (нужны файлы) */
         .story-box { background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%); border: 1px solid #fcd34d; padding: 30px; border-radius: 12px; margin-bottom: 25px; box-shadow: 0 10px 25px -5px rgba(251, 191, 36, 0.2); position: relative; overflow: hidden; }
         .story-title { font-weight: 700; color: #92400e; font-size: 20px; margin-top: 0; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; }
         .story-text { color: #78350f; font-size: 15px; line-height: 1.6; margin-bottom: 20px; }
@@ -85,9 +79,13 @@
         .growth-label { font-size: 12px; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; margin-top: 4px; }
         .growth-arrow { font-size: 24px; color: #d97706; }
 
-        /* Исправленная кнопка (без width: 100%) */
         .download-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 16px 32px; background: #d97706; color: white; text-decoration: none; font-size: 16px; font-weight: 600; border-radius: 8px; box-shadow: 0 4px 6px rgba(217, 119, 6, 0.3); transition: all 0.2s; border: none; width: auto; }
         .download-btn:hover { background: #b45309; transform: translateY(-2px); box-shadow: 0 6px 12px rgba(217, 119, 6, 0.4); }
+
+        /* Зеленый блок (все идеально) */
+        .success-box { background: #ecfdf5; border: 1px solid #6ee7b7; padding: 30px; border-radius: 12px; margin-bottom: 25px; text-align: center; box-shadow: 0 4px 6px rgba(16, 185, 129, 0.1); }
+        .success-title { color: #065f46; font-size: 20px; font-weight: 700; margin-top: 0; margin-bottom: 10px; }
+        .success-text { color: #047857; font-size: 15px; line-height: 1.5; }
     </style>
 </head>
 <body>
@@ -126,8 +124,9 @@
             <div style="color: #9ca3af; margin-top: 5px; font-size: 14px;">{{ result.url }}</div>
         </div>
 
-        <!-- БЛОК ИСТОРИИ УСПЕХА (Честная математика и список ИИ) -->
+        <!-- ЛОГИКА ОТОБРАЖЕНИЯ БЛОКОВ -->
         {% if potential_gain > 0 %}
+        <!-- ЖЕЛТЫЙ БЛОК: Если есть что исправлять -->
         <div class="story-box anim-pop">
             <h3 class="story-title">🚀 Как AI-поисковики помогут вам получать больше клиентов</h3>
             
@@ -136,10 +135,9 @@
             </p>
             
             <p class="story-text">
-                Сейчас ваш балл — <strong>{{ result.score }}</strong>. Это значит, что AI-поисковики видят вас ограниченно. Если вы добавите наши файлы, ваш балл вырастет до <strong>{{ result.score + potential_gain }}</strong>.
+                Сейчас ваш балл — <strong>{{ result.score }}</strong>. Это значит, что AI-поисковики видят вас ограниченно. Если вы добавите недостающие файлы из нашего архива, ваш балл вырастет до <strong>{{ result.score + potential_gain }}</strong>.
             </p>
 
-            <!-- Визуализация роста (Баллы, а не фейковые иксы) -->
             <div class="growth-visual">
                 <div class="growth-before">
                     <div class="growth-num">{{ result.score }}</div>
@@ -152,7 +150,6 @@
                 </div>
             </div>
 
-            <!-- Честные метрики -->
             <div style="background: rgba(255,255,255,0.6); padding: 15px; border-radius: 8px; margin: 15px 0; font-size: 14px;">
                 <p style="margin: 0 0 8px 0; font-weight: 600; color: #92400e;">📈 Что это даёт на практике:</p>
                 <ul style="margin: 0; padding-left: 20px; color: #78350f;">
@@ -165,13 +162,23 @@
                 *Прогноз основан на медианных данных рынка. Реальный рост зависит от вашего контента.
             </p>
 
-            <!-- Кнопка отцентрирована и не вылезает за рамки -->
             <div style="text-align: center;">
                 <a href="/download-files?url={{ result.url }}&cms={{ result.cms }}" class="download-btn">
                     📥 Скачать пакет для AI (ZIP)
                 </a>
             </div>
-            <p style="color: #92400e; font-size: 12px; margin-top: 12px; text-align: center; font-weight: 500;">Инструкция по установке уже внутри архива</p>
+            <p style="color: #92400e; font-size: 12px; margin-top: 12px; text-align: center; font-weight: 500;">Внутри архива: все файлы + инструкция</p>
+        </div>
+        {% else %}
+        <!-- ЗЕЛЕНЫЙ БЛОК: Если все идеально -->
+        <div class="success-box anim-pop">
+            <h3 class="success-title">🎉 Поздравляем! Ваш сайт полностью готов к AI</h3>
+            <p class="success-text">
+                У вас уже есть все необходимые технические файлы для нейросетей (ChatGPT, Perplexity, Claude и других). Они могут беспрепятственно читать ваш сайт и цитировать его в своих ответах.
+            </p>
+            <p class="success-text" style="margin-top: 15px; font-size: 13px; opacity: 0.8;">
+                Скачивать дополнительные файлы не требуется. Вы огромные молодцы!
+            </p>
         </div>
         {% endif %}
 

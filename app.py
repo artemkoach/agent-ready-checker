@@ -90,7 +90,6 @@ def download_files():
     if home_html and DEEPSEEK_KEY:
         try:
             soup = BeautifulSoup(home_html, "html.parser")
-            # Берем первые 2000 символов текста, чтобы не перегружать запрос
             site_text = soup.get_text(separator=' ', strip=True)[:2000]
             
             prompt = f"""
@@ -116,8 +115,14 @@ def download_files():
             )
             
             ai_data = json.loads(response.choices[0].message.content)
+            
             if "agent_json" in ai_data:
-                agent_json_content = json.dumps(ai_data["agent_json"], ensure_ascii=False, indent=2)
+                # Если ИИ вернул словарь (dict), превращаем в строку. Если строку - оставляем как есть.
+                if isinstance(ai_data["agent_json"], dict):
+                    agent_json_content = json.dumps(ai_data["agent_json"], ensure_ascii=False, indent=2)
+                else:
+                    agent_json_content = ai_data["agent_json"]
+            
             if "llms_txt" in ai_data:
                 llms_txt_content = ai_data["llms_txt"]
                 

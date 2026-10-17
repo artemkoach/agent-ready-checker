@@ -48,8 +48,8 @@ def index():
                 except Exception:
                     pass
                 
-                # Считаем потенциал только за те файлы, которые реально даем
-                target_keys = ["llms_txt", "robots_ai", "agent_json", "ai_plugin"]
+                # Считаем потенциал за все файлы, которые мы даем (включая JSON-LD)
+                target_keys = ["llms_txt", "robots_ai", "agent_json", "ai_plugin", "jsonld"]
                 for item in result["results"]:
                     if item["key"] in target_keys and not item["exists"]:
                         potential_gain += item["weight"]

@@ -219,7 +219,7 @@
         <ul class="check-list">
             {% for item in result.results %}
                 <li class="check-item {{ 'pass' if item.exists else 'fail' }}" style="animation: fadeInUp 0.4s ease-out forwards; opacity: 0; animation-delay: {{ loop.index0 * 0.08 }}s;">
-                    <span style="font-weight: 500; display: flex; align-items: center; flex-wrap: wrap; gap: 4px;">
+                    <span style="font-weight: 500; display: flex; align-items: center; flex-wrap: wrap; gap: 6px;">
                         {{ '✅' if item.exists else '❌' }} 
                         {{ item.label }}
                         
@@ -230,15 +230,18 @@
                             <span class="badge badge-agents">Агенты</span>
                         {% endif %}
 
-                        <!-- Логика статуса -->
-                        {% if item.key in ['llms_txt', 'agent_json'] %}
-                            <span class="badge-status status-ready" title="Этот файл сгенерирован ИИ специально под ваш сайт">Умный (ИИ)</span>
-                        {% elif item.key in ['robots_ai'] %}
-                            <span class="badge-status status-ready" title="Этот файл полностью готов к работе">Готов</span>
-                        {% elif item.key in ['mcp_json', 'ai_plugin', 'openapi', 'jsonld'] %}
-                            <span class="badge-status status-template" title="Мы даем базовый шаблон, который нужно настроить">Шаблон</span>
-                        {% elif item.key == 'sitemap' %}
-                            <span class="badge-status status-dev" title="Генерация этого файла появится в ближайших обновлениях">В разработке</span>
+                        <!-- ЧЕСТНЫЕ СТАТУСЫ -->
+                        {% if item.key in ['llms_txt', 'agent_json', 'ai_plugin'] %}
+                            <span class="badge-status status-ready" title="Этот файл сгенерирован ИИ под ваш сайт и полностью готов">ГОТОВЫЙ ФАЙЛ (ИИ)</span>
+                        
+                        {% elif item.key == 'robots_ai' %}
+                            <span class="badge-status status-ready" title="Стандартный файл, полностью готов">ГОТОВЫЙ ФАЙЛ</span>
+                        
+                        {% elif item.key == 'jsonld' %}
+                            <span class="badge-status status-ready" title="ИИ написал готовый код. Осталось скопировать его из инструкции на сайт">КОД + ИНСТРУКЦИЯ</span>
+                        
+                        {% else %}
+                            <span class="badge-status status-dev" title="Мы работаем над генерацией этого файла">В РАЗРАБОТКЕ</span>
                         {% endif %}
                     </span>
                     <span style="color: #9ca3af; font-weight: 600; white-space: nowrap; margin-left: 10px;">+{{ item.weight }}</span>

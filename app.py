@@ -49,7 +49,6 @@ def index():
                 except Exception:
                     pass
                 
-                # Теперь мы даем все файлы, кроме mcp и openapi
                 target_keys = ["llms_txt", "robots_ai", "sitemap", "agent_json", "ai_plugin", "jsonld"]
                 for item in result["results"]:
                     if item["key"] in target_keys and not item["exists"]:
@@ -94,30 +93,33 @@ def download_files():
             sitemap_xml += f"  <url>\n    <loc>{clean_url}</loc>\n  </url>\n"
     sitemap_xml += '</urlset>'
 
-    # Базовые заглушки
+    # Базовые заглушки (на случай полного отказа ИИ)
     agent_json_content = '{\n  "name": "Your Agent Name",\n  "url": "' + url + '",\n  "capabilities": []\n}'
     llms_txt_content = f"# LLMs.txt for {url}\n\n## Main Pages\n" + "\n".join(links)
     ai_plugin_content = '{\n  "schema_version": "v1",\n  "name_for_human": "Your Plugin",\n  "auth": { "type": "none" }\n}'
     jsonld_content = f'<script type="application/ld+json">\n{{\n  "@context": "https://schema.org",\n  "@type": "WebSite",\n  "name": "Your Site Name",\n  "url": "{url}"\n}}\n</script>'
 
-    if home_html and DEEPSEEK_KEY:
+    # --- ГЛАВНЫЙ ФИКС: ИИ ЗАПУСКАЕТСЯ ВСЕГДА ---
+    if DEEPSEEK_KEY:
         try:
-            soup = BeautifulSoup(home_html, "html.parser")
-            site_text = soup.get_text(separator=' ', strip=True)[:2000]
+            site_text = ""
             
-            # АГРЕССИВНЫЙ ФОЛБЭК ДЛЯ ПУСТЫХ САЙТОВ (SPA/React/Vue)
-            if len(site_text) < 50:
-                page_title = soup.title.string if soup.title else ""
-                meta_desc = soup.find("meta", attrs={"name": "description"})
-                desc_text = meta_desc["content"] if meta_desc else ""
+            # 1. Если сайт открылся, пытаемся взять текст
+            if home_html:
+                soup = BeautifulSoup(home_html, "html.parser")
+                site_text = soup.get_text(separator=' ', strip=True)[:2000]
                 
-                if not page_title and not desc_text:
-                    # Если даже title пустой, берем домен
-                    domain_name = url.split('//')[-1].split('/')[0].replace('www.', '')
-                    site_text = f"Название сайта неизвестно, но домен называется '{domain_name}'. Сделай логичное предположение о тематике сайта на основе этого домена."
-                else:
+                if len(site_text) < 50:
+                    page_title = soup.title.string if soup.title else ""
+                    meta_desc = soup.find("meta", attrs={"name": "description"})
+                    desc_text = meta_desc["content"] if meta_desc else ""
                     site_text = f"Название: {page_title}. Описание: {desc_text}"
             
+            # 2. Если сайт заблокирован или пустой (как travelata.ru), берем только домен
+            if len(site_text.strip()) < 50:
+                domain_name = url.split('//')[-1].split('/')[0].replace('www.', '')
+                site_text = f"Сайт {domain_name}. Сгенерируй логичное описание и функции на основе названия домена."
+
             prompt = f"""
             Проанализируй текст сайта: "{site_text}" (URL: {url}).
             Сгенерируй 4 документа:
@@ -136,7 +138,7 @@ def download_files():
                     {"role": "user", "content": prompt}
                 ],
                 response_format={ "type": "json_object" },
-                timeout=15
+                timeout=20 # Увеличили таймаут на случай тяжелых запросов
             )
             
             ai_data = json.loads(response.choices[0].message.content)
@@ -164,7 +166,6 @@ def download_files():
         zf.writestr("agent.json", agent_json_content)
         zf.writestr("ai-plugin.json", ai_plugin_content)
         
-        # Заглушки (пока в разработке)
         zf.writestr("mcp.json", '{\n  "mcpServers": {\n    "default": {\n      "command": "npx",\n      "args": ["-y", "@modelcontextprotocol/server-everything"]\n    }\n  }\n}')
         zf.writestr("openapi.json", '{\n  "openapi": "3.0.0",\n  "info": { "title": "API", "version": "1.0.0" },\n  "paths": {}\n}')
         

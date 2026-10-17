@@ -127,15 +127,6 @@
     {% endif %}
 
     {% if result %}
-        <div class="score-box anim-pop">
-            <div style="font-size: 14px; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600;">Оценка готовности</div>
-            <div>
-                <span class="score-number">{{ result.score }}</span>
-                <span class="score-out-of">/ 100</span>
-            </div>
-            <div style="color: #9ca3af; margin-top: 5px; font-size: 14px;">{{ result.url }}</div>
-        </div>
-
         {% if potential_gain > 0 %}
         <div class="story-box anim-pop">
             <h3 class="story-title">🚀 Как AI-поисковики помогут вам получать больше клиентов</h3>

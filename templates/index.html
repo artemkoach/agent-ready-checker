@@ -5,12 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Agent-Ready Checker</title>
     
-    <!-- Подключение дорогих шрифтов -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
 
-    <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-6SGJ9KLN8W"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
@@ -66,7 +64,6 @@
         .badge-geo { background: #e0f2fe; color: #0369a1; }
         .badge-agents { background: #f3e8ff; color: #7e22ce; }
 
-        /* Желтый блок (нужны файлы) */
         .story-box { background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%); border: 1px solid #fcd34d; padding: 30px; border-radius: 12px; margin-bottom: 25px; box-shadow: 0 10px 25px -5px rgba(251, 191, 36, 0.2); position: relative; overflow: hidden; }
         .story-title { font-weight: 700; color: #92400e; font-size: 20px; margin-top: 0; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; }
         .story-text { color: #78350f; font-size: 15px; line-height: 1.6; margin-bottom: 20px; }
@@ -82,7 +79,6 @@
         .download-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 16px 32px; background: #d97706; color: white; text-decoration: none; font-size: 16px; font-weight: 600; border-radius: 8px; box-shadow: 0 4px 6px rgba(217, 119, 6, 0.3); transition: all 0.2s; border: none; width: auto; }
         .download-btn:hover { background: #b45309; transform: translateY(-2px); box-shadow: 0 6px 12px rgba(217, 119, 6, 0.4); }
 
-        /* Зеленый блок (все идеально) */
         .success-box { background: #ecfdf5; border: 1px solid #6ee7b7; padding: 30px; border-radius: 12px; margin-bottom: 25px; text-align: center; box-shadow: 0 4px 6px rgba(16, 185, 129, 0.1); }
         .success-title { color: #065f46; font-size: 20px; font-weight: 700; margin-top: 0; margin-bottom: 10px; }
         .success-text { color: #047857; font-size: 15px; line-height: 1.5; }
@@ -124,9 +120,7 @@
             <div style="color: #9ca3af; margin-top: 5px; font-size: 14px;">{{ result.url }}</div>
         </div>
 
-        <!-- ЛОГИКА ОТОБРАЖЕНИЯ БЛОКОВ -->
         {% if potential_gain > 0 %}
-        <!-- ЖЕЛТЫЙ БЛОК: Если есть что исправлять -->
         <div class="story-box anim-pop">
             <h3 class="story-title">🚀 Как AI-поисковики помогут вам получать больше клиентов</h3>
             
@@ -153,8 +147,17 @@
             <div style="background: rgba(255,255,255,0.6); padding: 15px; border-radius: 8px; margin: 15px 0; font-size: 14px;">
                 <p style="margin: 0 0 8px 0; font-weight: 600; color: #92400e;">📈 Что это даёт на практике:</p>
                 <ul style="margin: 0; padding-left: 20px; color: #78350f;">
-                    <li><strong>Качество лидов:</strong> прогнозируемый рост конверсии в <strong>{{ conversion_lift }}x</strong> раз(а), так как посетители из AI уже готовы к покупке.</li>
-                    <li><strong>Бесплатный трафик:</strong> нейросети начнут цитировать вас в ответах на вопросы пользователей.</li>
+                    <li><strong>Прогноз конверсии:</strong> благодаря AI-трафику, показатель вырастет в <strong>{{ conversion_lift }}x</strong> раз(а).</li>
+                    
+                    {% set new_score = result.score + potential_gain %}
+                    
+                    {% if new_score >= 71 %}
+                        <li><strong>Статус для AI:</strong> «Авторитетный источник». Нейросети будут активно цитировать вас в ответах, приводя «горячих» клиентов, которые уже готовы к покупке.</li>
+                    {% elif new_score >= 31 %}
+                        <li><strong>Статус для AI:</strong> «Понятный сайт». ChatGPT и Perplexity начнут регулярно считывать ваш контент и иногда рекомендовать вас пользователям.</li>
+                    {% else %}
+                        <li><strong>Статус для AI:</strong> «Базовый доступ». Вы перестанете быть «белым пятном» для нейросетей. Они начнут видеть ваш сайт и постепенно изучать его.</li>
+                    {% endif %}
                 </ul>
             </div>
 
@@ -170,7 +173,6 @@
             <p style="color: #92400e; font-size: 12px; margin-top: 12px; text-align: center; font-weight: 500;">Внутри архива: все файлы + инструкция</p>
         </div>
         {% else %}
-        <!-- ЗЕЛЕНЫЙ БЛОК: Если все идеально -->
         <div class="success-box anim-pop">
             <h3 class="success-title">🎉 Поздравляем! Ваш сайт полностью готов к AI</h3>
             <p class="success-text">

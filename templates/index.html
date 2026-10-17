@@ -19,291 +19,76 @@
 
     <style>
         * { box-sizing: border-box; }
+        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; max-width: 700px; margin: 40px auto; padding: 0 20px; background: #f9fafb; color: #1f2937; line-height: 1.5; }
         
-        body { 
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; 
-            max-width: 700px; 
-            margin: 40px auto; 
-            padding: 0 20px; 
-            background: #f9fafb; 
-            color: #1f2937; 
-            line-height: 1.5; 
-        }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes popIn { 0% { opacity: 0; transform: scale(0.9); } 100% { opacity: 1; transform: scale(1); } }
+        @keyframes glow { 0% { box-shadow: 0 0 0 0 rgba(234, 179, 8, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(234, 179, 8, 0); } 100% { box-shadow: 0 0 0 0 rgba(234, 179, 8, 0); } }
         
-        @keyframes fadeInUp { 
-            from { opacity: 0; transform: translateY(20px); } 
-            to { opacity: 1; transform: translateY(0); } 
-        }
-        
-        @keyframes popIn { 
-            0% { opacity: 0; transform: scale(0.9); } 
-            100% { opacity: 1; transform: scale(1); } 
-        }
-        
-        .anim-fade { 
-            animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; 
-            opacity: 0; 
-        }
-        
-        .anim-pop { 
-            animation: popIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; 
-            opacity: 0; 
-        }
-        
+        .anim-fade { animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; }
+        .anim-pop { animation: popIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; }
         .delay-1 { animation-delay: 0.1s; }
         .delay-2 { animation-delay: 0.2s; }
         
         h1 { margin-bottom: 5px; font-weight: 700; letter-spacing: -0.02em; }
         p.subtitle { color: #6b7280; margin-top: 0; margin-bottom: 25px; font-size: 16px; font-weight: 400; }
         
-        .info-box { 
-            background: #eff6ff; 
-            border-left: 4px solid #3b82f6; 
-            padding: 15px 20px; 
-            border-radius: 6px; 
-            margin-bottom: 30px; 
-            font-size: 14px; 
-            line-height: 1.6; 
-            color: #1e3a8a; 
-        }
-        
+        .info-box { background: #eff6ff; border-left: 4px solid #3b82f6; padding: 15px 20px; border-radius: 6px; margin-bottom: 30px; font-size: 14px; line-height: 1.6; color: #1e3a8a; }
         .info-box strong { color: #1d4ed8; }
         
         form { display: flex; gap: 10px; margin-bottom: 30px; }
+        input[type="text"] { flex: 1; padding: 12px 16px; font-size: 16px; font-family: 'Inter', sans-serif; border: 1px solid #d1d5db; border-radius: 8px; outline: none; transition: all 0.2s; }
+        input[type="text"]:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.15); transform: translateY(-1px); }
         
-        input[type="text"] { 
-            flex: 1; 
-            padding: 12px 16px; 
-            font-size: 16px; 
-            font-family: 'Inter', sans-serif; 
-            border: 1px solid #d1d5db; 
-            border-radius: 8px; 
-            outline: none; 
-            transition: all 0.2s; 
-        }
-        
-        input[type="text"]:focus { 
-            border-color: #3b82f6; 
-            box-shadow: 0 0 0 3px rgba(59,130,246,0.15); 
-            transform: translateY(-1px); 
-        }
-        
-        button { 
-            padding: 12px 24px; 
-            font-size: 16px; 
-            font-family: 'Inter', sans-serif; 
-            background: #2563eb; 
-            color: white; 
-            border: none; 
-            border-radius: 8px; 
-            cursor: pointer; 
-            font-weight: 600; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            min-width: 140px; 
-            transition: all 0.2s; 
-            box-shadow: 0 2px 4px rgba(37,99,235,0.2); 
-        }
-        
-        button:hover:not(:disabled) { 
-            background: #1d4ed8; 
-            transform: translateY(-1px); 
-            box-shadow: 0 4px 8px rgba(37,99,235,0.3); 
-        }
-        
-        button:active:not(:disabled) { 
-            transform: translateY(1px); 
-            box-shadow: 0 1px 2px rgba(37,99,235,0.2); 
-        }
-        
-        button:disabled { 
-            background: #93c5fd; 
-            cursor: not-allowed; 
-            box-shadow: none; 
-        }
+        button { padding: 12px 24px; font-size: 16px; font-family: 'Inter', sans-serif; background: #2563eb; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; display: flex; align-items: center; justify-content: center; min-width: 140px; transition: all 0.2s; box-shadow: 0 2px 4px rgba(37,99,235,0.2); }
+        button:hover:not(:disabled) { background: #1d4ed8; transform: translateY(-1px); box-shadow: 0 4px 8px rgba(37,99,235,0.3); }
+        button:active:not(:disabled) { transform: translateY(1px); box-shadow: 0 1px 2px rgba(37,99,235,0.2); }
+        button:disabled { background: #93c5fd; cursor: not-allowed; box-shadow: none; }
 
-        /* ЕДИНСТВЕННЫЙ БЛОК С ОЦЕНКОЙ */
-        .score-box { 
-            background: white; 
-            padding: 30px 20px; 
-            border-radius: 12px; 
-            box-shadow: 0 4px 20px rgba(0,0,0,0.04); 
-            margin-bottom: 25px; 
-            text-align: center; 
-            border: 1px solid #f3f4f6; 
-        }
-        
-        .score-number { 
-            font-family: 'Playfair Display', serif; 
-            font-size: 64px; 
-            font-weight: 700; 
-            color: #111827; 
-            line-height: 1; 
-            margin: 10px 0; 
-        }
-        
-        .score-out-of { 
-            font-size: 24px; 
-            color: #9ca3af; 
-            font-weight: 600; 
-            font-family: 'Inter', sans-serif; 
-        }
+        .score-box { background: white; padding: 30px 20px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.04); margin-bottom: 25px; text-align: center; border: 1px solid #f3f4f6; }
+        .score-number { font-family: 'Playfair Display', serif; font-size: 64px; font-weight: 700; color: #111827; line-height: 1; margin: 10px 0; }
+        .score-out-of { font-size: 24px; color: #9ca3af; font-weight: 600; font-family: 'Inter', sans-serif; }
         
         .check-list { list-style: none; padding: 0; }
-        
-        .check-item { 
-            background: white; 
-            padding: 16px 20px; 
-            margin-bottom: 8px; 
-            border-radius: 8px; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            box-shadow: 0 1px 3px rgba(0,0,0,0.04); 
-            transition: transform 0.2s, box-shadow 0.2s; 
-            border: 1px solid transparent; 
-        }
-        
-        .check-item:hover { 
-            transform: translateX(4px); 
-            box-shadow: 0 4px 12px rgba(0,0,0,0.06); 
-            border-color: #e5e7eb; 
-        }
+        .check-item { background: white; padding: 16px 20px; margin-bottom: 8px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 1px 3px rgba(0,0,0,0.04); transition: transform 0.2s, box-shadow 0.2s; border: 1px solid transparent; }
+        .check-item:hover { transform: translateX(4px); box-shadow: 0 4px 12px rgba(0,0,0,0.06); border-color: #e5e7eb; }
         
         .pass { border-left: 4px solid #10b981; }
         .fail { border-left: 4px solid #ef4444; }
+        .error { background: #fef2f2; color: #991b1b; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #fecaca; }
         
-        .error { 
-            background: #fef2f2; 
-            color: #991b1b; 
-            padding: 15px; 
-            border-radius: 8px; 
-            margin-bottom: 20px; 
-            border: 1px solid #fecaca; 
-        }
-        
-        .badge { 
-            padding: 3px 8px; 
-            border-radius: 6px; 
-            font-size: 11px; 
-            font-weight: 600; 
-            margin-left: 8px; 
-            vertical-align: middle; 
-            letter-spacing: 0.05em; 
-            text-transform: uppercase; 
-        }
-        
+        .badge { padding: 3px 8px; border-radius: 6px; font-size: 11px; font-weight: 600; margin-left: 8px; vertical-align: middle; letter-spacing: 0.05em; text-transform: uppercase; }
         .badge-geo { background: #e0f2fe; color: #0369a1; }
         .badge-agents { background: #f3e8ff; color: #7e22ce; }
 
-        .badge-status { 
-            padding: 2px 6px; 
-            border-radius: 4px; 
-            font-size: 10px; 
-            font-weight: 700; 
-            margin-left: 6px; 
-            text-transform: uppercase; 
-            letter-spacing: 0.05em; 
-            border: 1px solid transparent; 
-            vertical-align: middle; 
-        }
-        
+        .badge-status { padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 700; margin-left: 6px; text-transform: uppercase; letter-spacing: 0.05em; border: 1px solid transparent; vertical-align: middle; }
         .status-ready { background: #d1fae5; color: #065f46; border-color: #a7f3d0; }
+        .status-template { background: #fef3c7; color: #92400e; border-color: #fde68a; }
         .status-dev { background: #f3f4f6; color: #4b5563; border-color: #e5e7eb; }
 
-        .story-box { 
-            background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%); 
-            border: 1px solid #fcd34d; 
-            padding: 30px; 
-            border-radius: 12px; 
-            margin-bottom: 25px; 
-            box-shadow: 0 10px 25px -5px rgba(251, 191, 36, 0.2); 
-            position: relative; 
-            overflow: hidden; 
-        }
-        
-        .story-title { 
-            font-weight: 700; 
-            color: #92400e; 
-            font-size: 20px; 
-            margin-top: 0; 
-            margin-bottom: 15px; 
-            display: flex; 
-            align-items: center; 
-            gap: 10px; 
-        }
-        
+        .story-box { background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%); border: 1px solid #fcd34d; padding: 30px; border-radius: 12px; margin-bottom: 25px; box-shadow: 0 10px 25px -5px rgba(251, 191, 36, 0.2); position: relative; overflow: hidden; }
+        .story-title { font-weight: 700; color: #92400e; font-size: 20px; margin-top: 0; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; }
         .story-text { color: #78350f; font-size: 15px; line-height: 1.6; margin-bottom: 20px; }
         
-        .download-btn { 
-            display: inline-flex; 
-            align-items: center; 
-            justify-content: center; 
-            gap: 8px; 
-            padding: 16px 32px; 
-            background: #d97706; 
-            color: white; 
-            text-decoration: none; 
-            font-size: 16px; 
-            font-weight: 600; 
-            border-radius: 8px; 
-            box-shadow: 0 4px 6px rgba(217, 119, 6, 0.3); 
-            transition: all 0.2s; 
-            border: none; 
-            width: auto; 
-        }
-        
-        .download-btn:hover { 
-            background: #b45309; 
-            transform: translateY(-2px); 
-            box-shadow: 0 6px 12px rgba(217, 119, 6, 0.4); 
-        }
+        .growth-visual { display: flex; align-items: center; justify-content: center; gap: 20px; margin: 20px 0; background: rgba(255,255,255,0.6); padding: 15px; border-radius: 8px; }
+        .growth-before { text-align: center; }
+        .growth-after { text-align: center; }
+        .growth-num { font-size: 24px; font-weight: 700; color: #9ca3af; }
+        .growth-num.new { color: #059669; font-size: 32px; animation: glow 2s infinite; border-radius: 8px; padding: 0 10px; }
+        .growth-label { font-size: 12px; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; margin-top: 4px; }
+        .growth-arrow { font-size: 24px; color: #d97706; }
 
-        .success-box { 
-            background: #ecfdf5; 
-            border: 1px solid #6ee7b7; 
-            padding: 30px; 
-            border-radius: 12px; 
-            margin-bottom: 25px; 
-            text-align: center; 
-            box-shadow: 0 4px 6px rgba(16, 185, 129, 0.1); 
-        }
-        
+        .download-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 16px 32px; background: #d97706; color: white; text-decoration: none; font-size: 16px; font-weight: 600; border-radius: 8px; box-shadow: 0 4px 6px rgba(217, 119, 6, 0.3); transition: all 0.2s; border: none; width: auto; }
+        .download-btn:hover { background: #b45309; transform: translateY(-2px); box-shadow: 0 6px 12px rgba(217, 119, 6, 0.4); }
+
+        .success-box { background: #ecfdf5; border: 1px solid #6ee7b7; padding: 30px; border-radius: 12px; margin-bottom: 25px; text-align: center; box-shadow: 0 4px 6px rgba(16, 185, 129, 0.1); }
         .success-title { color: #065f46; font-size: 20px; font-weight: 700; margin-top: 0; margin-bottom: 10px; }
         .success-text { color: #047857; font-size: 15px; line-height: 1.5; }
 
-        .loading-overlay { 
-            position: fixed; 
-            top: 0; 
-            left: 0; 
-            width: 100vw; 
-            height: 100vh; 
-            background: rgba(249, 250, 251, 0.95); 
-            backdrop-filter: blur(8px); 
-            display: none; 
-            flex-direction: column; 
-            align-items: center; 
-            justify-content: center; 
-            z-index: 9999; 
-            opacity: 0; 
-            transition: opacity 0.3s ease; 
-        }
-        
+        .loading-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(249, 250, 251, 0.95); backdrop-filter: blur(8px); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; opacity: 0; transition: opacity 0.3s ease; }
         .loading-overlay.active { display: flex; opacity: 1; }
-        
-        .ai-spinner { 
-            width: 60px; 
-            height: 60px; 
-            border: 5px solid #e5e7eb; 
-            border-top-color: #2563eb; 
-            border-radius: 50%; 
-            animation: spin 1s linear infinite; 
-            margin-bottom: 25px; 
-        }
-        
+        .ai-spinner { width: 60px; height: 60px; border: 5px solid #e5e7eb; border-top-color: #2563eb; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 25px; }
         @keyframes spin { to { transform: rotate(360deg); } }
-        
         .loading-title { font-size: 24px; font-weight: 700; color: #111827; margin-bottom: 10px; }
         .loading-dynamic { font-size: 16px; color: #4b5563; font-weight: 500; height: 24px; margin-bottom: 20px; }
         .loading-note { font-size: 13px; color: #9ca3af; max-width: 300px; text-align: center; line-height: 1.4; }
@@ -342,7 +127,6 @@
     {% endif %}
 
     {% if result %}
-        <!-- ГЛАВНАЯ ОЦЕНКА (ТОЛЬКО ЗДЕСЬ) -->
         <div class="score-box anim-pop">
             <div style="font-size: 14px; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600;">Оценка готовности</div>
             <div>
@@ -361,22 +145,31 @@
             </p>
             
             <p class="story-text">
-                Сейчас ваш технический балл — <strong>{{ result.score }}</strong>. Это значит, что AI-поисковики видят вас ограниченно. Если вы добавите файлы из нашего архива, он вырастет до <strong>{{ result.score + potential_gain }}</strong>. 
-                <br><br>
-                <em style="font-size: 13px;">ИИ уже проанализировал ваш сайт и сгенерировал уникальные файлы (agent.json и llms.txt) специально под ваш бизнес.</em>
+                Сейчас ваш технический балл — <strong>{{ result.score }}</strong>. Это значит, что AI-поисковики видят вас ограниченно. Если вы добавите файлы из нашего архива, ситуация изменится.
             </p>
 
-            <!-- ПОТЕНЦИАЛ БЕЗ ДУБЛИРОВАНИЯ ОЦЕНКИ -->
-            <div style="text-align: center; margin: 25px 0; background: rgba(255,255,255,0.6); padding: 20px; border-radius: 8px;">
-                <div style="font-size: 14px; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; margin-bottom: 5px;">Потенциал после установки файлов</div>
-                <div style="font-family: 'Playfair Display', serif; font-size: 48px; font-weight: 700; color: #059669; line-height: 1;">{{ result.score + potential_gain }} <span style="font-size: 20px; color: #9ca3af;">/ 100</span></div>
+            <!-- МАТЕМАТИЧЕСКАЯ МОДЕЛЬ В ДЕЙСТВИИ -->
+            <div style="background: rgba(255,255,255,0.6); padding: 20px; border-radius: 8px; margin: 20px 0;">
+                <div style="text-align: center; margin-bottom: 15px; font-weight: 600; color: #92400e;">Рост вашей оценки:</div>
+                <div style="display: flex; align-items: center; justify-content: center; gap: 20px;">
+                    <div style="text-align: center;">
+                        <div style="font-size: 12px; color: #6b7280; text-transform: uppercase; font-weight: 600; margin-bottom: 5px;">Сейчас</div>
+                        <div style="font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 700; color: #9ca3af; line-height: 1;">{{ result.score }}</div>
+                    </div>
+                    <div style="font-size: 24px; color: #d97706;">➔</div>
+                    <div style="text-align: center;">
+                        <div style="font-size: 12px; color: #6b7280; text-transform: uppercase; font-weight: 600; margin-bottom: 5px;">С нашими файлами</div>
+                        <div style="font-family: 'Playfair Display', serif; font-size: 48px; font-weight: 700; color: #059669; line-height: 1;">{{ result.score + potential_gain }} <span style="font-size: 20px; color: #9ca3af;">/ 100</span></div>
+                    </div>
+                </div>
+                <div style="text-align: center; margin-top: 15px; padding-top: 15px; border-top: 1px dashed #fcd34d; font-size: 15px; color: #78350f;">
+                    Прогноз роста конверсии в AI-поиске: <strong style="color: #059669; font-size: 18px;">{{ conversion_lift }}x</strong>
+                </div>
             </div>
 
             <div style="background: rgba(255,255,255,0.6); padding: 15px; border-radius: 8px; margin: 15px 0; font-size: 14px;">
                 <p style="margin: 0 0 8px 0; font-weight: 600; color: #92400e;">📈 Что это даёт на практике:</p>
                 <ul style="margin: 0; padding-left: 20px; color: #78350f;">
-                    <li><strong>Прогноз конверсии:</strong> в перспективе до <strong>{{ conversion_lift }}x</strong> раз(а) (при условии качественного контента на сайте).</li>
-                    
                     {% set new_score = result.score + potential_gain %}
                     
                     {% if new_score >= 71 %}

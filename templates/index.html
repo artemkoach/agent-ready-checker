@@ -1,6 +1,15 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agent-Ready Checker</title>
+    
+    <!-- Подключение дорогих шрифтов -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
+
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-6SGJ9KLN8W"></script>
     <script>
@@ -10,66 +19,76 @@
       gtag('config', 'G-6SGJ9KLN8W');
     </script>
 
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Agent-Ready Checker</title>
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; max-width: 700px; margin: 40px auto; padding: 0 20px; background: #f9fafb; color: #333; }
+        /* Применяем строгий шрифт Inter ко всему сайту */
+        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; max-width: 700px; margin: 40px auto; padding: 0 20px; background: #f9fafb; color: #1f2937; line-height: 1.5; }
         
         /* --- АНИМАЦИИ --- */
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes popIn {
-            0% { opacity: 0; transform: scale(0.9); }
-            100% { opacity: 1; transform: scale(1); }
-        }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes popIn { 0% { opacity: 0; transform: scale(0.9); } 100% { opacity: 1; transform: scale(1); } }
+        @keyframes glow { 0% { box-shadow: 0 0 0 0 rgba(234, 179, 8, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(234, 179, 8, 0); } 100% { box-shadow: 0 0 0 0 rgba(234, 179, 8, 0); } }
         
         .anim-fade { animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; }
         .anim-pop { animation: popIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; }
-        
         .delay-1 { animation-delay: 0.1s; }
         .delay-2 { animation-delay: 0.2s; }
         
-        h1 { margin-bottom: 5px; }
-        p.subtitle { color: #666; margin-top: 0; margin-bottom: 25px; font-size: 16px; }
+        h1 { margin-bottom: 5px; font-weight: 700; letter-spacing: -0.02em; }
+        p.subtitle { color: #6b7280; margin-top: 0; margin-bottom: 25px; font-size: 16px; font-weight: 400; }
         
-        .info-box { background: #e0f2fe; border-left: 4px solid #0284c7; padding: 15px 20px; border-radius: 6px; margin-bottom: 30px; font-size: 14px; line-height: 1.6; color: #0f172a; }
-        .info-box strong { color: #0369a1; }
+        .info-box { background: #eff6ff; border-left: 4px solid #3b82f6; padding: 15px 20px; border-radius: 6px; margin-bottom: 30px; font-size: 14px; line-height: 1.6; color: #1e3a8a; }
+        .info-box strong { color: #1d4ed8; }
         
         form { display: flex; gap: 10px; margin-bottom: 30px; }
-        input[type="text"] { flex: 1; padding: 12px; font-size: 16px; border: 1px solid #ccc; border-radius: 6px; outline: none; transition: all 0.2s; }
-        input[type="text"]:focus { border-color: #0070f3; box-shadow: 0 0 0 3px rgba(0,112,243,0.15); transform: translateY(-1px); }
+        input[type="text"] { flex: 1; padding: 12px 16px; font-size: 16px; font-family: 'Inter', sans-serif; border: 1px solid #d1d5db; border-radius: 8px; outline: none; transition: all 0.2s; }
+        input[type="text"]:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.15); transform: translateY(-1px); }
         
-        button { padding: 12px 24px; font-size: 16px; background: #0070f3; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; display: flex; align-items: center; justify-content: center; min-width: 140px; transition: all 0.2s; box-shadow: 0 2px 4px rgba(0,112,243,0.2); }
-        button:hover:not(:disabled) { background: #005bb5; transform: translateY(-1px); box-shadow: 0 4px 8px rgba(0,112,243,0.3); }
-        button:active:not(:disabled) { transform: translateY(1px); box-shadow: 0 1px 2px rgba(0,112,243,0.2); }
+        button { padding: 12px 24px; font-size: 16px; font-family: 'Inter', sans-serif; background: #2563eb; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; display: flex; align-items: center; justify-content: center; min-width: 140px; transition: all 0.2s; box-shadow: 0 2px 4px rgba(37,99,235,0.2); }
+        button:hover:not(:disabled) { background: #1d4ed8; transform: translateY(-1px); box-shadow: 0 4px 8px rgba(37,99,235,0.3); }
+        button:active:not(:disabled) { transform: translateY(1px); box-shadow: 0 1px 2px rgba(37,99,235,0.2); }
         button:disabled { background: #93c5fd; cursor: not-allowed; box-shadow: none; }
         
         .spinner { display: none; width: 18px; height: 18px; border: 3px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: white; animation: spin 1s ease-in-out infinite; margin-right: 8px; }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        .score-box { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 20px; text-align: center; }
-        .score-number { font-size: 48px; font-weight: bold; color: #0070f3; }
+        .score-box { background: white; padding: 30px 20px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.04); margin-bottom: 25px; text-align: center; border: 1px solid #f3f4f6; }
+        
+        /* Применяем шикарный шрифт Playfair Display к цифре */
+        .score-number { font-family: 'Playfair Display', serif; font-size: 64px; font-weight: 700; color: #111827; line-height: 1; margin: 10px 0; }
+        .score-out-of { font-size: 24px; color: #9ca3af; font-weight: 600; font-family: 'Inter', sans-serif; }
         
         .check-list { list-style: none; padding: 0; }
-        .check-item { background: white; padding: 15px; margin-bottom: 8px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 1px 3px rgba(0,0,0,0.05); transition: transform 0.2s, box-shadow 0.2s; }
-        .check-item:hover { transform: translateX(4px); box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+        .check-item { background: white; padding: 16px 20px; margin-bottom: 8px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 1px 3px rgba(0,0,0,0.04); transition: transform 0.2s, box-shadow 0.2s; border: 1px solid transparent; }
+        .check-item:hover { transform: translateX(4px); box-shadow: 0 4px 12px rgba(0,0,0,0.06); border-color: #e5e7eb; }
         
-        .pass { border-left: 4px solid #22c55e; }
+        .pass { border-left: 4px solid #10b981; }
         .fail { border-left: 4px solid #ef4444; }
-        .error { background: #fee2e2; color: #b91c1c; padding: 15px; border-radius: 6px; margin-bottom: 20px; }
+        .error { background: #fef2f2; color: #991b1b; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #fecaca; }
         
-        .badge { padding: 2px 6px; border-radius: 4px; font-size: 11px; font-weight: bold; margin-left: 8px; vertical-align: middle; }
+        .badge { padding: 3px 8px; border-radius: 6px; font-size: 11px; font-weight: 600; margin-left: 8px; vertical-align: middle; letter-spacing: 0.05em; text-transform: uppercase; }
         .badge-geo { background: #e0f2fe; color: #0369a1; }
         .badge-agents { background: #f3e8ff; color: #7e22ce; }
+
+        /* Стили для блока истории успеха */
+        .story-box { background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%); border: 1px solid #fcd34d; padding: 30px; border-radius: 12px; margin-bottom: 25px; box-shadow: 0 10px 25px -5px rgba(251, 191, 36, 0.2); position: relative; overflow: hidden; }
+        .story-title { font-weight: 700; color: #92400e; font-size: 20px; margin-top: 0; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; }
+        .story-text { color: #78350f; font-size: 15px; line-height: 1.6; margin-bottom: 20px; }
+        
+        .growth-visual { display: flex; align-items: center; justify-content: center; gap: 20px; margin: 20px 0; background: rgba(255,255,255,0.6); padding: 15px; border-radius: 8px; }
+        .growth-before { text-align: center; }
+        .growth-after { text-align: center; }
+        .growth-num { font-size: 24px; font-weight: 700; color: #9ca3af; }
+        .growth-num.new { color: #059669; font-size: 32px; animation: glow 2s infinite; border-radius: 8px; padding: 0 10px; }
+        .growth-label { font-size: 12px; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; margin-top: 4px; }
+        .growth-arrow { font-size: 24px; color: #d97706; }
+
+        .download-btn { display: inline-flex; align-items: center; gap: 8px; padding: 16px 32px; background: #d97706; color: white; text-decoration: none; font-size: 16px; font-weight: 600; border-radius: 8px; box-shadow: 0 4px 6px rgba(217, 119, 6, 0.3); transition: all 0.2s; border: none; width: 100%; justify-content: center; }
+        .download-btn:hover { background: #b45309; transform: translateY(-2px); box-shadow: 0 6px 12px rgba(217, 119, 6, 0.4); }
     </style>
 </head>
 <body>
-    <!-- Глобальный счетчик проверок -->
-    <div class="anim-fade" style="text-align: right; font-size: 13px; color: #888; margin-bottom: 10px;">
-        Всего проверок сделано: <strong style="color: #0070f3;">{{ total_checks }}</strong>
+    <div class="anim-fade" style="text-align: right; font-size: 13px; color: #9ca3af; margin-bottom: 10px; font-weight: 500;">
+        Всего проверок сделано: <strong style="color: #2563eb;">{{ total_checks }}</strong>
     </div>
 
     <div class="anim-fade">
@@ -95,45 +114,56 @@
 
     {% if result %}
         <div class="score-box anim-pop">
-            <div>Оценка готовности</div>
-            <div class="score-number">{{ result.score }} / 100</div>
-            <div style="color: #666; margin-top: 5px;">{{ result.url }}</div>
+            <div style="font-size: 14px; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600;">Оценка готовности</div>
+            <div>
+                <span class="score-number">{{ result.score }}</span>
+                <span class="score-out-of">/ 100</span>
+            </div>
+            <div style="color: #9ca3af; margin-top: 5px; font-size: 14px;">{{ result.url }}</div>
         </div>
 
-        <!-- Желтый блок с предсказанием улучшения и кнопкой скачивания -->
+        <!-- БЛОК ИСТОРИИ УСПЕХА (Storytelling) -->
         {% if potential_gain > 0 %}
-        <div class="anim-pop" style="background: #fef08a; border: 1px solid #eab308; padding: 25px 20px; border-radius: 8px; margin-bottom: 20px; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
-            <h3 style="margin-top: 0; color: #854d0e; font-size: 20px;">🚀 Получите бесплатный трафик от нейросетей!</h3>
+        <div class="story-box anim-pop">
+            <h3 class="story-title">🚀 Как увеличить поток клиентов в 10 раз?</h3>
             
-            <p style="color: #713f12; font-size: 15px; line-height: 1.5; margin-bottom: 15px;">
-                Прямо сейчас ChatGPT и Perplexity <strong>не понимают ваш сайт</strong> и не рекомендуют его пользователям. Вы теряете клиентов, которых получают ваши конкуренты.
+            <p class="story-text">
+                Прямо сейчас нейросети <strong>не понимают ваш сайт</strong> и рекомендуют конкурентов. Вы теряете потенциальных клиентов, которые ищут ваши услуги через ChatGPT и Perplexity.
             </p>
             
-            <div style="background: rgba(255,255,255,0.6); padding: 15px; border-radius: 6px; margin-bottom: 20px; display: inline-block;">
-                <p style="color: #713f12; margin: 0 0 5px 0;">
-                    Если вы добавите наши готовые файлы, оценка вырастет на <strong>+{{ potential_gain }} баллов</strong>.
-                </p>
-                <p style="color: #713f12; margin: 0; font-size: 18px;">
-                    Новая оценка: <strong>{{ result.score + potential_gain }} / 100</strong>
-                </p>
-            </div>
-            
-            <p style="color: #713f12; font-size: 14px; margin-bottom: 20px;">
-                <em>Эти файлы — «визитка» для AI. Они объяснят нейросетям, что вы — авторитетный источник, и повысят шанс на бесплатные упоминания вас в ответах.</em>
+            <p class="story-text">
+                Представьте: если сейчас вас находят <strong>100 человек</strong> в день. Добавив наши файлы, нейросети начнут цитировать вас в ответах. Уже через месяц ваш трафик может выглядеть так:
             </p>
 
-            <a href="/download-files?url={{ result.url }}&cms={{ result.cms }}" style="display: inline-flex; align-items: center; gap: 8px; padding: 14px 28px; background: #eab308; color: #422006; text-decoration: none; font-size: 16px; font-weight: bold; border-radius: 8px; box-shadow: 0 4px 6px rgba(234, 179, 8, 0.4); transition: all 0.2s;" onmouseover="this.style.background='#ca8a04'; this.style.transform='translateY(-2px)'" onmouseout="this.style.background='#eab308'; this.style.transform='translateY(0)'">
+            <!-- Визуализация роста -->
+            <div class="growth-visual">
+                <div class="growth-before">
+                    <div class="growth-num">100</div>
+                    <div class="growth-label">Сейчас</div>
+                </div>
+                <div class="growth-arrow">➔</div>
+                <div class="growth-after">
+                    <!-- Высчитываем потенциальный рост (например, умножаем на 10 для наглядности) -->
+                    <div class="growth-num new">{{ result.score + potential_gain }}x</div>
+                    <div class="growth-label">Потенциал</div>
+                </div>
+            </div>
+
+            <p class="story-text" style="font-size: 14px; font-style: italic; text-align: center; margin-bottom: 20px;">
+                Эти файлы — ваша «визитка» для AI. Они объяснят нейросетям, что вы — авторитетный источник.
+            </p>
+
+            <a href="/download-files?url={{ result.url }}&cms={{ result.cms }}" class="download-btn">
                 📥 Скачать пакет для AI (ZIP)
             </a>
-            <p style="color: #854d0e; font-size: 12px; margin-top: 10px;">Инструкция по установке уже внутри архива</p>
+            <p style="color: #92400e; font-size: 12px; margin-top: 12px; text-align: center; font-weight: 500;">Инструкция по установке уже внутри архива</p>
         </div>
         {% endif %}
 
         <ul class="check-list">
             {% for item in result.results %}
-                <!-- Добавляем анимацию появления для каждой карточки с задержкой -->
                 <li class="check-item {{ 'pass' if item.exists else 'fail' }}" style="animation: fadeInUp 0.4s ease-out forwards; opacity: 0; animation-delay: {{ loop.index0 * 0.08 }}s;">
-                    <span>
+                    <span style="font-weight: 500;">
                         {{ '✅' if item.exists else '❌' }} 
                         {{ item.label }}
                         {% if item.category == 'GEO' %}
@@ -142,21 +172,20 @@
                             <span class="badge badge-agents">Агенты</span>
                         {% endif %}
                     </span>
-                    <span style="color: #888;">+{{ item.weight }}</span>
+                    <span style="color: #9ca3af; font-weight: 600;">+{{ item.weight }}</span>
                 </li>
             {% endfor %}
         </ul>
 
-        <div class="anim-fade" style="animation-delay: {{ result.results|length * 0.08 }}s; margin-top: 40px; padding: 15px; background: white; border-radius: 8px; font-size: 13px; color: #555; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
-            <p style="margin-top: 0;"><strong>Что это значит?</strong></p>
-            <p style="margin-bottom: 5px;"><span style="color: #0369a1; font-weight: bold;">GEO (Generative Engine Optimization)</span> — проверки, которые помогают ChatGPT, Perplexity и Google AI Overviews найти ваш сайт и цитировать его в ответах.</p>
-            <p style="margin-bottom: 0;"><span style="color: #7e22ce; font-weight: bold;">Агенты</span> — технические файлы, которые позволяют AI-агентам не просто читать сайт, но и совершать на нем действия (например, заказывать товары или вызывать API).</p>
+        <div class="anim-fade" style="animation-delay: {{ result.results|length * 0.08 }}s; margin-top: 40px; padding: 20px; background: white; border-radius: 12px; font-size: 14px; color: #4b5563; box-shadow: 0 2px 10px rgba(0,0,0,0.03);">
+            <p style="margin-top: 0; font-weight: 700; color: #111827; font-size: 16px;">Что это значит?</p>
+            <p style="margin-bottom: 10px;"><span style="color: #0369a1; font-weight: 700;">GEO (Generative Engine Optimization)</span> — проверки, которые помогают ChatGPT, Perplexity и Google AI Overviews найти ваш сайт и цитировать его в ответах.</p>
+            <p style="margin-bottom: 0;"><span style="color: #7e22ce; font-weight: 700;">Агенты</span> — технические файлы, которые позволяют AI-агентам не просто читать сайт, но и совершать на нем действия (например, заказывать товары или вызывать API).</p>
         </div>
     {% endif %}
 
-    <!-- Кнопка перехода на GitHub -->
     <div style="text-align: center; margin-top: 50px; margin-bottom: 30px;">
-        <a href="https://github.com/artemkoach/agent-ready-checker" target="_blank" style="display: inline-flex; align-items: center; gap: 8px; color: #666; text-decoration: none; font-size: 14px; font-weight: 500; padding: 10px 20px; border-radius: 8px; background: white; box-shadow: 0 1px 3px rgba(0,0,0,0.05); transition: all 0.2s;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.1)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 1px 3px rgba(0,0,0,0.05)'">
+        <a href="https://github.com/artemkoach/agent-ready-checker" target="_blank" style="display: inline-flex; align-items: center; gap: 8px; color: #6b7280; text-decoration: none; font-size: 14px; font-weight: 500; padding: 10px 20px; border-radius: 8px; background: white; box-shadow: 0 1px 3px rgba(0,0,0,0.05); transition: all 0.2s; border: 1px solid #e5e7eb;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.08)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 1px 3px rgba(0,0,0,0.05)'">
             <svg height="20" width="20" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path></svg>
             Смотреть исходный код на GitHub
         </a>

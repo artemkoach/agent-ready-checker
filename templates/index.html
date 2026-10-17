@@ -60,6 +60,8 @@
         .badge { padding: 3px 8px; border-radius: 6px; font-size: 11px; font-weight: 600; margin-left: 8px; vertical-align: middle; letter-spacing: 0.05em; text-transform: uppercase; }
         .badge-geo { background: #e0f2fe; color: #0369a1; }
         .badge-agents { background: #f3e8ff; color: #7e22ce; }
+        /* ДОБАВЛЕН СТИЛЬ ДЛЯ КОНТЕНТА */
+        .badge-content { background: #fef3c7; color: #92400e; }
 
         .badge-status { padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 700; margin-left: 6px; text-transform: uppercase; letter-spacing: 0.05em; border: 1px solid transparent; vertical-align: middle; }
         .status-ready { background: #d1fae5; color: #065f46; border-color: #a7f3d0; }
@@ -204,16 +206,21 @@
                             <span class="badge badge-geo">GEO</span>
                         {% elif item.category == 'Агенты' %}
                             <span class="badge badge-agents">Агенты</span>
+                        {% elif item.category == 'Контент' %}
+                            <span class="badge badge-content">Контент</span>
                         {% endif %}
 
-                        {% if item.key in ['llms_txt', 'agent_json', 'ai_plugin', 'robots_ai', 'sitemap'] %}
+                        {% if item.key in ['llms_txt', 'agent_json', 'ai_plugin', 'robots_ai', 'sitemap', 'llms_full'] %}
                             <span class="badge-status status-ready" title="Этот файл полностью готов к работе">ГОТОВЫЙ ФАЙЛ</span>
                         
                         {% elif item.key == 'jsonld' %}
                             <span class="badge-status status-ready" title="В архиве лежит готовый код, который нужно вставить на сайт">КОД + ИНСТРУКЦИЯ</span>
                         
-                        {% else %}
+                        {% elif item.key in ['mcp_json', 'openapi'] %}
                             <span class="badge-status status-dev" title="Мы работаем над генерацией этого файла">В РАЗРАБОТКЕ</span>
+                            
+                        {% else %}
+                            <span class="badge-status status-template" title="Мы проверяем наличие этого на сайте">ПРОВЕРКА</span>
                         {% endif %}
 
                     </span>
@@ -275,7 +282,8 @@
             }, 5000);
         }
     </script>
-        <!-- Логотип AS Hedging Lab -->
+    
+    <!-- Логотип AS Hedging Lab (ОСТАВЛЕН БЕЗ ИЗМЕНЕНИЙ) -->
     <div style="position: fixed; bottom: 20px; left: 20px; display: flex; flex-direction: column; z-index: 1000; pointer-events: none;">
         <span style="font-size: 10px; color: #9ca3af; margin-bottom: 5px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em;">При поддержке</span>
         

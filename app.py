@@ -49,7 +49,7 @@ def index():
                 except Exception:
                     pass
                 
-                target_keys = ["llms_txt", "robots_ai", "sitemap", "agent_json", "ai_plugin", "jsonld"]
+                target_keys = ["llms_txt", "robots_ai", "sitemap", "agent_json", "ai_plugin", "jsonld", "llms_full"]
                 for item in result["results"]:
                     if item["key"] in target_keys and not item["exists"]:
                         potential_gain += item["weight"]
@@ -88,7 +88,6 @@ def download_files():
         match = re.search(r'\((.*?)\)', link)
         if match:
             page_url = match.group(1)
-            # Отрезаем всё, что начинается с ?
             clean_url = page_url.split('?')[0]
             sitemap_xml += f"  <url>\n    <loc>{clean_url}</loc>\n  </url>\n"
     sitemap_xml += '</urlset>'
@@ -96,6 +95,10 @@ def download_files():
     # Базовые заглушки (на случай полного отказа ИИ)
     agent_json_content = '{\n  "name": "Your Agent Name",\n  "url": "' + url + '",\n  "capabilities": []\n}'
     llms_txt_content = f"# LLMs.txt for {url}\n\n## Main Pages\n" + "\n".join(links)
+    
+    # ДОБАВЛЕНО: Базовая заглушка для llms-full
+    llms_full_content = f"# LLMs Full.txt for {url}\n\n## Extended Data\n" + "\n".join(links)
+    
     ai_plugin_content = '{\n  "schema_version": "v1",\n  "name_for_human": "Your Plugin",\n  "auth": { "type": "none" }\n}'
     jsonld_content = f'<script type="application/ld+json">\n{{\n  "@context": "https://schema.org",\n  "@type": "WebSite",\n  "name": "Your Site Name",\n  "url": "{url}"\n}}\n</script>'
 
@@ -104,7 +107,6 @@ def download_files():
         try:
             site_text = ""
             
-            # 1. Если сайт открылся, пытаемся взять текст
             if home_html:
                 soup = BeautifulSoup(home_html, "html.parser")
                 site_text = soup.get_text(separator=' ', strip=True)[:2000]
@@ -115,20 +117,21 @@ def download_files():
                     desc_text = meta_desc["content"] if meta_desc else ""
                     site_text = f"Название: {page_title}. Описание: {desc_text}"
             
-            # 2. Если сайт заблокирован или пустой (как travelata.ru), берем только домен
             if len(site_text.strip()) < 50:
                 domain_name = url.split('//')[-1].split('/')[0].replace('www.', '')
                 site_text = f"Сайт {domain_name}. Сгенерируй логичное описание и функции на основе названия домена."
 
+            # ИЗМЕНЕНО: Просим 5 документов, включая llms_full
             prompt = f"""
             Проанализируй текст сайта: "{site_text}" (URL: {url}).
-            Сгенерируй 4 документа:
+            Сгенерируй 5 документов:
             1. agent.json: name, description, url, capabilities (массив из 3-5 функций).
             2. llms.txt: краткое описание и 5 ссылок на разделы.
-            3. ai_plugin: schema_version (v1), name_for_human, description_for_human, auth (type: none).
-            4. jsonld_script: готовый код <script type="application/ld+json"> с полями @context, @type, name, url, description.
+            3. llms_full.txt: расширенное описание и 10-15 ссылок на разделы.
+            4. ai_plugin: schema_version (v1), name_for_human, description_for_human, auth (type: none).
+            5. jsonld_script: готовый код <script type="application/ld+json"> с полями @context, @type, name, url, description.
 
-            Верни ответ СТРОГО в формате JSON с ключами "agent_json", "llms_txt", "ai_plugin", "jsonld_script". Без markdown-разметки.
+            Верни ответ СТРОГО в формате JSON с ключами "agent_json", "llms_txt", "llms_full", "ai_plugin", "jsonld_script". Без markdown-разметки.
             """
             
             response = client.chat.completions.create(
@@ -138,7 +141,7 @@ def download_files():
                     {"role": "user", "content": prompt}
                 ],
                 response_format={ "type": "json_object" },
-                timeout=20 # Увеличили таймаут на случай тяжелых запросов
+                timeout=20
             )
             
             ai_data = json.loads(response.choices[0].message.content)
@@ -147,6 +150,11 @@ def download_files():
                 agent_json_content = json.dumps(ai_data["agent_json"], ensure_ascii=False, indent=2) if isinstance(ai_data["agent_json"], dict) else ai_data["agent_json"]
             if "llms_txt" in ai_data:
                 llms_txt_content = ai_data["llms_txt"]
+                
+            # ДОБАВЛЕНО: Извлекаем llms_full из ответа ИИ
+            if "llms_full" in ai_data:
+                llms_full_content = ai_data["llms_full"]
+                
             if "ai_plugin" in ai_data:
                 ai_plugin_content = json.dumps(ai_data["ai_plugin"], ensure_ascii=False, indent=2) if isinstance(ai_data["ai_plugin"], dict) else ai_data["ai_plugin"]
             if "jsonld_script" in ai_data:
@@ -158,6 +166,9 @@ def download_files():
     memory_file = io.BytesIO()
     with zipfile.ZipFile(memory_file, 'w') as zf:
         zf.writestr("llms.txt", llms_txt_content)
+        
+        # ИЗМЕНЕНО: Записываем реальный llms_full вместо склейки
+        zf.writestr("llms-full.txt", llms_full_content) 
         
         robots_content = "User-agent: GPTBot\nAllow: /\n\nUser-agent: ClaudeBot\nAllow: /\n\nUser-agent: PerplexityBot\nAllow: /\n\nUser-agent: *\nAllow: /"
         zf.writestr("robots.txt", robots_content)

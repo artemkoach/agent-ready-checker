@@ -206,7 +206,7 @@
                             <span class="badge badge-agents">Агенты</span>
                         {% endif %}
 
-                        {% if item.key in ['llms_txt', 'agent_json', 'ai_plugin', 'robots_ai'] %}
+                        {% if item.key in ['llms_txt', 'agent_json', 'ai_plugin', 'robots_ai', 'sitemap'] %}
                             <span class="badge-status status-ready" title="Этот файл полностью готов к работе">ГОТОВЫЙ ФАЙЛ</span>
                         
                         {% elif item.key == 'jsonld' %}
@@ -215,6 +215,7 @@
                         {% else %}
                             <span class="badge-status status-dev" title="Мы работаем над генерацией этого файла">В РАЗРАБОТКЕ</span>
                         {% endif %}
+                        
                     </span>
                     <span style="color: #9ca3af; font-weight: 600; white-space: nowrap; margin-left: 10px;">+{{ item.weight }}</span>
                 </li>

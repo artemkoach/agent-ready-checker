@@ -57,7 +57,7 @@ def _extract_links(html: str, base_url: str) -> list:
         
         if parsed.netloc == domain and full_url not in seen:
             seen.add(full_url)
-            if len(links) < 15:
+            if len(links) < 50:
                 text = a.get_text(strip=True) or "Страница"
                 text = " ".join(text.split())[:50] 
                 links.append(f"- [{text}]({full_url})")

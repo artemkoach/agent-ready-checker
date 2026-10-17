@@ -1,3 +1,4 @@
+import requests
 from flask import Flask, render_template, request, send_file
 from checker import check_url
 import io
@@ -5,15 +6,18 @@ import zipfile
 
 app = Flask(__name__)
 
-# Глобальный счетчик проверок
-TOTAL_CHECKS = 0
+# --- НАСТРОЙКА ПРОСТОГО СЧЕТЧИКА ---
+# Придумываем уникальное имя для нашего счетчика (можешь написать свое)
+COUNTER_NAMESPACE = "agent-ready-checker-artem"
+COUNTER_KEY = "total_checks"
+COUNTER_URL = f"https://api.counterapi.dev/v1/{COUNTER_NAMESPACE}/{COUNTER_KEY}"
 
 @app.route("/", methods=["GET", "POST"])
 def index():
-    global TOTAL_CHECKS
     result = None
     error = None
     potential_gain = 0
+    current_total = 0 # Переменная для текущего значения счетчика
     
     if request.method == "POST":
         url = request.form.get("url", "").strip()
@@ -24,7 +28,14 @@ def index():
                 url = "https://" + url
             try:
                 result = check_url(url)
-                TOTAL_CHECKS += 1
+                
+                # Увеличиваем счетчик на внешнем сервисе CounterAPI
+                try:
+                    res = requests.get(f"{COUNTER_URL}/up", timeout=3)
+                    if res.status_code == 200:
+                        current_total = res.json().get("count", 0)
+                except Exception:
+                    pass # Если сервис недоступен, просто идем дальше
                 
                 # Считаем, сколько баллов можно получить за llms.txt и robots.txt
                 for item in result["results"]:
@@ -34,8 +45,17 @@ def index():
                         potential_gain += 15
             except Exception as e:
                 error = f"Не удалось проверить сайт: {e}"
-                
-    return render_template("index.html", result=result, error=error, total_checks=TOTAL_CHECKS, potential_gain=potential_gain)
+    
+    # Если это просто заход на сайт (GET), читаем текущую цифру из CounterAPI
+    if not current_total:
+        try:
+            res = requests.get(COUNTER_URL, timeout=3)
+            if res.status_code == 200:
+                current_total = res.json().get("count", 0)
+        except Exception:
+            current_total = 0
+            
+    return render_template("index.html", result=result, error=error, total_checks=current_total, potential_gain=potential_gain)
 
 @app.route("/download-files")
 def download_files():

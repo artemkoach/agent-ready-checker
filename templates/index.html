@@ -61,6 +61,12 @@
         .badge-geo { background: #e0f2fe; color: #0369a1; }
         .badge-agents { background: #f3e8ff; color: #7e22ce; }
 
+        /* Новые бейджики статуса */
+        .badge-status { padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 700; margin-left: 6px; text-transform: uppercase; letter-spacing: 0.05em; border: 1px solid transparent; vertical-align: middle; }
+        .status-ready { background: #d1fae5; color: #065f46; border-color: #a7f3d0; }
+        .status-template { background: #fef3c7; color: #92400e; border-color: #fde68a; }
+        .status-dev { background: #f3f4f6; color: #4b5563; border-color: #e5e7eb; }
+
         .story-box { background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%); border: 1px solid #fcd34d; padding: 30px; border-radius: 12px; margin-bottom: 25px; box-shadow: 0 10px 25px -5px rgba(251, 191, 36, 0.2); position: relative; overflow: hidden; }
         .story-title { font-weight: 700; color: #92400e; font-size: 20px; margin-top: 0; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; }
         .story-text { color: #78350f; font-size: 15px; line-height: 1.6; margin-bottom: 20px; }
@@ -213,16 +219,29 @@
         <ul class="check-list">
             {% for item in result.results %}
                 <li class="check-item {{ 'pass' if item.exists else 'fail' }}" style="animation: fadeInUp 0.4s ease-out forwards; opacity: 0; animation-delay: {{ loop.index0 * 0.08 }}s;">
-                    <span style="font-weight: 500;">
+                    <span style="font-weight: 500; display: flex; align-items: center; flex-wrap: wrap; gap: 4px;">
                         {{ '✅' if item.exists else '❌' }} 
                         {{ item.label }}
+                        
+                        <!-- Бейджик категории -->
                         {% if item.category == 'GEO' %}
                             <span class="badge badge-geo">GEO</span>
                         {% elif item.category == 'Агенты' %}
                             <span class="badge badge-agents">Агенты</span>
                         {% endif %}
+
+                        <!-- Логика статуса -->
+                        {% if item.key in ['llms_txt', 'agent_json'] %}
+                            <span class="badge-status status-ready" title="Этот файл сгенерирован ИИ специально под ваш сайт">Умный (ИИ)</span>
+                        {% elif item.key in ['robots_ai'] %}
+                            <span class="badge-status status-ready" title="Этот файл полностью готов к работе">Готов</span>
+                        {% elif item.key in ['mcp_json', 'ai_plugin', 'openapi', 'jsonld'] %}
+                            <span class="badge-status status-template" title="Мы даем базовый шаблон, который нужно настроить">Шаблон</span>
+                        {% elif item.key == 'sitemap' %}
+                            <span class="badge-status status-dev" title="Генерация этого файла появится в ближайших обновлениях">В разработке</span>
+                        {% endif %}
                     </span>
-                    <span style="color: #9ca3af; font-weight: 600;">+{{ item.weight }}</span>
+                    <span style="color: #9ca3af; font-weight: 600; white-space: nowrap; margin-left: 10px;">+{{ item.weight }}</span>
                 </li>
             {% endfor %}
         </ul>
@@ -245,14 +264,10 @@
         let loadingInterval;
 
         function showLoading() {
-            // 1. Показываем экран загрузки
             const overlay = document.getElementById('loading-overlay');
             overlay.classList.add('active');
-            
-            // 2. Отключаем кнопку отправки
             document.getElementById('submit-btn').disabled = true;
 
-            // 3. Запускаем смену текста (чтобы пользователь видел прогресс)
             const texts = [
                 "Читаем структуру сайта...",
                 "ИИ анализирует контент...",
@@ -270,17 +285,15 @@
                 if (i < texts.length) {
                     dynamicText.textContent = texts[i];
                 }
-            }, 2000); // Меняем текст каждые 2 секунды
+            }, 2000);
         }
 
-                // Отдельная функция загрузки при клике на скачивание архива
         function showDownloadLoading() {
             const overlay = document.getElementById('loading-overlay');
             document.querySelector('.loading-title').textContent = "📦 Создаем архив...";
             document.getElementById('dynamic-loading-text').textContent = "ИИ генерирует файлы для вашего сайта...";
             overlay.classList.add('active');
             
-            // Автоматически скрываем экран через 5 секунд (файл начнет скачиваться, а экран исчезнет)
             setTimeout(() => {
                 overlay.classList.remove('active');
             }, 5000);

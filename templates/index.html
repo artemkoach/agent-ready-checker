@@ -44,9 +44,6 @@
         button:hover:not(:disabled) { background: #1d4ed8; transform: translateY(-1px); box-shadow: 0 4px 8px rgba(37,99,235,0.3); }
         button:active:not(:disabled) { transform: translateY(1px); box-shadow: 0 1px 2px rgba(37,99,235,0.2); }
         button:disabled { background: #93c5fd; cursor: not-allowed; box-shadow: none; }
-        
-        .spinner { display: none; width: 18px; height: 18px; border: 3px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: white; animation: spin 1s ease-in-out infinite; margin-right: 8px; }
-        @keyframes spin { to { transform: rotate(360deg); } }
 
         .score-box { background: white; padding: 30px 20px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.04); margin-bottom: 25px; text-align: center; border: 1px solid #f3f4f6; }
         .score-number { font-family: 'Playfair Display', serif; font-size: 64px; font-weight: 700; color: #111827; line-height: 1; margin: 10px 0; }
@@ -82,9 +79,37 @@
         .success-box { background: #ecfdf5; border: 1px solid #6ee7b7; padding: 30px; border-radius: 12px; margin-bottom: 25px; text-align: center; box-shadow: 0 4px 6px rgba(16, 185, 129, 0.1); }
         .success-title { color: #065f46; font-size: 20px; font-weight: 700; margin-top: 0; margin-bottom: 10px; }
         .success-text { color: #047857; font-size: 15px; line-height: 1.5; }
+
+        /* --- СТИЛИ ДЛЯ ЭКРАНА ЗАГРУЗКИ --- */
+        .loading-overlay {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(249, 250, 251, 0.95);
+            backdrop-filter: blur(8px);
+            display: none; flex-direction: column; align-items: center; justify-content: center;
+            z-index: 9999; opacity: 0; transition: opacity 0.3s ease;
+        }
+        .loading-overlay.active { display: flex; opacity: 1; }
+        
+        .ai-spinner {
+            width: 60px; height: 60px; border: 5px solid #e5e7eb; border-top-color: #2563eb;
+            border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 25px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        
+        .loading-title { font-size: 24px; font-weight: 700; color: #111827; margin-bottom: 10px; }
+        .loading-dynamic { font-size: 16px; color: #4b5563; font-weight: 500; height: 24px; margin-bottom: 20px; }
+        .loading-note { font-size: 13px; color: #9ca3af; max-width: 300px; text-align: center; line-height: 1.4; }
     </style>
 </head>
 <body>
+    <!-- ЭКРАН ЗАГРУЗКИ -->
+    <div id="loading-overlay" class="loading-overlay">
+        <div class="ai-spinner"></div>
+        <div class="loading-title">🤖 Нейросеть работает</div>
+        <div class="loading-dynamic" id="dynamic-loading-text">Читаем ваш сайт...</div>
+        <div class="loading-note">ИИ анализирует контент и генерирует файлы. Пожалуйста, подождите 5–10 секунд.</div>
+    </div>
+
     <div class="anim-fade" style="text-align: right; font-size: 13px; color: #9ca3af; margin-bottom: 10px; font-weight: 500;">
         Всего проверок сделано: <strong style="color: #2563eb;">{{ total_checks }}</strong>
     </div>
@@ -101,7 +126,6 @@
     <form method="POST" id="checker-form" onsubmit="showLoading()" class="anim-fade delay-2">
         <input type="text" name="url" placeholder="example.com" value="{{ request.form.url or '' }}" required>
         <button type="submit" id="submit-btn">
-            <span class="spinner" id="spinner"></span>
             <span id="btn-text">Проверить</span>
         </button>
     </form>
@@ -131,7 +155,7 @@
             <p class="story-text">
                 Сейчас ваш технический балл — <strong>{{ result.score }}</strong>. Это значит, что AI-поисковики видят вас ограниченно. Если вы добавите файлы из нашего архива, он вырастет до <strong>{{ result.score + potential_gain }}</strong>. 
                 <br><br>
-                <em style="font-size: 13px;">Мы уже проанализировали структуру вашего сайта и положили в архив <strong>умный llms.txt</strong> с реальной картой ваших страниц.</em>
+                <em style="font-size: 13px;">ИИ уже проанализировал ваш сайт и сгенерировал уникальные файлы (agent.json и llms.txt) специально под ваш бизнес.</em>
             </p>
 
             <div class="growth-visual">
@@ -168,11 +192,11 @@
             </p>
 
             <div style="text-align: center;">
-                <a href="/download-files?url={{ result.url }}&cms={{ result.cms }}" class="download-btn">
+                <a href="/download-files?url={{ result.url }}&cms={{ result.cms }}" class="download-btn" onclick="showDownloadLoading()">
                     📥 Скачать пакет для AI (ZIP)
                 </a>
             </div>
-            <p style="color: #92400e; font-size: 12px; margin-top: 12px; text-align: center; font-weight: 500;">Внутри архива: все файлы + инструкция под ваш движок</p>
+            <p style="color: #92400e; font-size: 12px; margin-top: 12px; text-align: center; font-weight: 500;">Внутри архива: умные файлы от ИИ + инструкция под ваш движок</p>
         </div>
         {% else %}
         <div class="success-box anim-pop">
@@ -218,13 +242,43 @@
     </div>
 
     <script>
+        let loadingInterval;
+
         function showLoading() {
-            const btn = document.getElementById('submit-btn');
-            const spinner = document.getElementById('spinner');
-            const btnText = document.getElementById('btn-text');
-            btn.disabled = true;
-            spinner.style.display = 'inline-block';
-            btnText.textContent = 'Анализ...';
+            // 1. Показываем экран загрузки
+            const overlay = document.getElementById('loading-overlay');
+            overlay.classList.add('active');
+            
+            // 2. Отключаем кнопку отправки
+            document.getElementById('submit-btn').disabled = true;
+
+            // 3. Запускаем смену текста (чтобы пользователь видел прогресс)
+            const texts = [
+                "Читаем структуру сайта...",
+                "ИИ анализирует контент...",
+                "Генерируем agent.json...",
+                "Формируем умный llms.txt...",
+                "Упаковываем архив...",
+                "Почти готово..."
+            ];
+            let i = 0;
+            const dynamicText = document.getElementById('dynamic-loading-text');
+            dynamicText.textContent = texts[0];
+            
+            loadingInterval = setInterval(() => {
+                i++;
+                if (i < texts.length) {
+                    dynamicText.textContent = texts[i];
+                }
+            }, 2000); // Меняем текст каждые 2 секунды
+        }
+
+        // Отдельная функция загрузки при клике на скачивание архива
+        function showDownloadLoading() {
+            const overlay = document.getElementById('loading-overlay');
+            document.querySelector('.loading-title').textContent = "📦 Создаем архив...";
+            document.getElementById('dynamic-loading-text').textContent = "ИИ генерирует файлы для вашего сайта...";
+            overlay.classList.add('active');
         }
     </script>
 </body>

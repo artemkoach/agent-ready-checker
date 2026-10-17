@@ -1,35 +1,63 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-6SGJ9KLN8W"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-6SGJ9KLN8W');
+    </script>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Agent-Ready Checker</title>
     <style>
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; max-width: 700px; margin: 40px auto; padding: 0 20px; background: #f9fafb; color: #333; }
+        
+        /* --- АНИМАЦИИ --- */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes popIn {
+            0% { opacity: 0; transform: scale(0.9); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+        
+        /* Классы для применения анимаций */
+        .anim-fade { animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; }
+        .anim-pop { animation: popIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; }
+        
+        .delay-1 { animation-delay: 0.1s; }
+        .delay-2 { animation-delay: 0.2s; }
+        
         h1 { margin-bottom: 5px; }
         p.subtitle { color: #666; margin-top: 0; margin-bottom: 25px; font-size: 16px; }
         
-        /* Блок с описанием */
         .info-box { background: #e0f2fe; border-left: 4px solid #0284c7; padding: 15px 20px; border-radius: 6px; margin-bottom: 30px; font-size: 14px; line-height: 1.6; color: #0f172a; }
         .info-box strong { color: #0369a1; }
         
         form { display: flex; gap: 10px; margin-bottom: 30px; }
-        input[type="text"] { flex: 1; padding: 12px; font-size: 16px; border: 1px solid #ccc; border-radius: 6px; outline: none; }
-        input[type="text"]:focus { border-color: #0070f3; box-shadow: 0 0 0 2px rgba(0,112,243,0.2); }
+        input[type="text"] { flex: 1; padding: 12px; font-size: 16px; border: 1px solid #ccc; border-radius: 6px; outline: none; transition: all 0.2s; }
+        input[type="text"]:focus { border-color: #0070f3; box-shadow: 0 0 0 3px rgba(0,112,243,0.15); transform: translateY(-1px); }
         
-        /* Кнопка и анимация загрузки */
-        button { padding: 12px 24px; font-size: 16px; background: #0070f3; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; display: flex; align-items: center; justify-content: center; min-width: 140px; transition: background 0.2s; }
-        button:hover { background: #005bb5; }
-        button:disabled { background: #93c5fd; cursor: not-allowed; }
+        button { padding: 12px 24px; font-size: 16px; background: #0070f3; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; display: flex; align-items: center; justify-content: center; min-width: 140px; transition: all 0.2s; box-shadow: 0 2px 4px rgba(0,112,243,0.2); }
+        button:hover:not(:disabled) { background: #005bb5; transform: translateY(-1px); box-shadow: 0 4px 8px rgba(0,112,243,0.3); }
+        button:active:not(:disabled) { transform: translateY(1px); box-shadow: 0 1px 2px rgba(0,112,243,0.2); }
+        button:disabled { background: #93c5fd; cursor: not-allowed; box-shadow: none; }
         
         .spinner { display: none; width: 18px; height: 18px; border: 3px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: white; animation: spin 1s ease-in-out infinite; margin-right: 8px; }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* Результаты */
         .score-box { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 20px; text-align: center; }
         .score-number { font-size: 48px; font-weight: bold; color: #0070f3; }
+        
         .check-list { list-style: none; padding: 0; }
-        .check-item { background: white; padding: 15px; margin-bottom: 8px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .check-item { background: white; padding: 15px; margin-bottom: 8px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 1px 3px rgba(0,0,0,0.05); transition: transform 0.2s, box-shadow 0.2s; }
+        .check-item:hover { transform: translateX(4px); box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+        
         .pass { border-left: 4px solid #22c55e; }
         .fail { border-left: 4px solid #ef4444; }
         .error { background: #fee2e2; color: #b91c1c; padding: 15px; border-radius: 6px; margin-bottom: 20px; }
@@ -40,15 +68,16 @@
     </style>
 </head>
 <body>
-    <h1>Agent-Ready Checker</h1>
-    <p class="subtitle">Проверьте, готов ли ваш сайт к приходу AI-агентов и GEO-продвижению.</p>
+    <div class="anim-fade">
+        <h1>Agent-Ready Checker</h1>
+        <p class="subtitle">Проверьте, готов ли ваш сайт к приходу AI-агентов и GEO-продвижению.</p>
+    </div>
 
-    <!-- Блок с описанием -->
-    <div class="info-box">
+    <div class="info-box anim-fade delay-1">
         <strong>Зачем это нужно?</strong> Нейросети (ChatGPT, Claude, Perplexity) уже ищут информацию в интернете. Чтобы они находили и цитировали ваш сайт, он должен быть к этому готов технически. Введите адрес сайта, чтобы узнать его оценку от 0 до 100 и получить список того, что нужно доработать.
     </div>
 
-    <form method="POST" id="checker-form" onsubmit="showLoading()">
+    <form method="POST" id="checker-form" onsubmit="showLoading()" class="anim-fade delay-2">
         <input type="text" name="url" placeholder="example.com" value="{{ request.form.url or '' }}" required>
         <button type="submit" id="submit-btn">
             <span class="spinner" id="spinner"></span>
@@ -57,11 +86,11 @@
     </form>
 
     {% if error %}
-        <div class="error">{{ error }}</div>
+        <div class="error anim-pop">{{ error }}</div>
     {% endif %}
 
     {% if result %}
-        <div class="score-box">
+        <div class="score-box anim-pop">
             <div>Оценка готовности</div>
             <div class="score-number">{{ result.score }} / 100</div>
             <div style="color: #666; margin-top: 5px;">{{ result.url }}</div>
@@ -69,7 +98,8 @@
 
         <ul class="check-list">
             {% for item in result.results %}
-                <li class="check-item {{ 'pass' if item.exists else 'fail' }}">
+                <!-- Добавляем анимацию появления для каждой карточки с задержкой -->
+                <li class="check-item {{ 'pass' if item.exists else 'fail' }}" style="animation: fadeInUp 0.4s ease-out forwards; opacity: 0; animation-delay: {{ loop.index0 * 0.08 }}s;">
                     <span>
                         {{ '✅' if item.exists else '❌' }} 
                         {{ item.label }}
@@ -84,22 +114,18 @@
             {% endfor %}
         </ul>
 
-        <div style="margin-top: 40px; padding: 15px; background: white; border-radius: 8px; font-size: 13px; color: #555; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+        <div class="anim-fade" style="animation-delay: {{ result.results|length * 0.08 }}s; margin-top: 40px; padding: 15px; background: white; border-radius: 8px; font-size: 13px; color: #555; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
             <p style="margin-top: 0;"><strong>Что это значит?</strong></p>
             <p style="margin-bottom: 5px;"><span style="color: #0369a1; font-weight: bold;">GEO (Generative Engine Optimization)</span> — проверки, которые помогают ChatGPT, Perplexity и Google AI Overviews найти ваш сайт и цитировать его в ответах.</p>
             <p style="margin-bottom: 0;"><span style="color: #7e22ce; font-weight: bold;">Агенты</span> — технические файлы, которые позволяют AI-агентам не просто читать сайт, но и совершать на нем действия (например, заказывать товары или вызывать API).</p>
         </div>
     {% endif %}
 
-    <!-- JavaScript для анимации кнопки -->
     <script>
         function showLoading() {
-            // Находим элементы
             const btn = document.getElementById('submit-btn');
             const spinner = document.getElementById('spinner');
             const btnText = document.getElementById('btn-text');
-            
-            // Меняем вид кнопки
             btn.disabled = true;
             spinner.style.display = 'inline-block';
             btnText.textContent = 'Анализ...';

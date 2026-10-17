@@ -138,7 +138,8 @@
 
         {% if potential_gain > 0 %}
         <div class="story-box anim-pop">
-            <h3 class="story-title">🚀 Как AI-поисковики помогут вам получать больше клиентов</h3>
+            <!-- УБРАНА РАКЕТА -->
+            <h3 class="story-title">Как AI-поисковики помогут вам получать больше клиентов</h3>
             
             <p class="story-text">
                 Нейросети — <strong>ChatGPT, Perplexity, Claude, Gemini, Copilot, DeepSeek, Grok</strong> и другие — уже рекомендуют сайты пользователям. Но они делают это только для тех сайтов, которые технически готовы к диалогу.
@@ -150,16 +151,10 @@
                 <em style="font-size: 13px;">ИИ уже проанализировал ваш сайт и сгенерировал уникальные файлы (agent.json и llms.txt) специально под ваш бизнес.</em>
             </p>
 
-            <div class="growth-visual">
-                <div class="growth-before">
-                    <div class="growth-num">{{ result.score }}</div>
-                    <div class="growth-label">Балл сейчас</div>
-                </div>
-                <div class="growth-arrow">➔</div>
-                <div class="growth-after">
-                    <div class="growth-num new">{{ result.score + potential_gain }}</div>
-                    <div class="growth-label">Новый балл</div>
-                </div>
+            <!-- УБРАНО ДУБЛИРОВАНИЕ, ОСТАВЛЕН ТОЛЬКО ПОТЕНЦИАЛ -->
+            <div class="growth-visual" style="padding: 20px; flex-direction: column; gap: 5px;">
+                <div class="growth-label" style="font-size: 14px; color: #6b7280;">Потенциал после установки файлов</div>
+                <div class="growth-num new" style="font-size: 48px;">{{ result.score + potential_gain }} <span style="font-size: 20px; color: #9ca3af;">/ 100</span></div>
             </div>
 
             <div style="background: rgba(255,255,255,0.6); padding: 15px; border-radius: 8px; margin: 15px 0; font-size: 14px;">
@@ -216,7 +211,7 @@
                             <span class="badge badge-agents">Агенты</span>
                         {% endif %}
 
-                        <!-- ФИНАЛЬНАЯ ЛОГИКА СТАТУСОВ -->
+                        <!-- ЛОГИКА СТАТУСОВ -->
                         {% if item.key in ['llms_txt', 'agent_json', 'ai_plugin', 'robots_ai'] %}
                             <span class="badge-status status-ready" title="Этот файл полностью готов к работе">ГОТОВЫЙ ФАЙЛ</span>
                         

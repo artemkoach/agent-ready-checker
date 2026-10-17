@@ -83,13 +83,15 @@ def download_files():
     home_html = _fetch(url)
     links = _extract_links(home_html, url) if home_html else [f"- [Главная]({url}): Главная страница"]
     
-    # --- ГЕНЕРАЦИЯ SITEMAP.XML ---
+    # --- ГЕНЕРАЦИЯ SITEMAP.XML (С ОЧИСТКОЙ ОТ UTM) ---
     sitemap_xml = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
     for link in links:
         match = re.search(r'\((.*?)\)', link)
         if match:
             page_url = match.group(1)
-            sitemap_xml += f"  <url>\n    <loc>{page_url}</loc>\n  </url>\n"
+            # Отрезаем всё, что начинается с ?
+            clean_url = page_url.split('?')[0]
+            sitemap_xml += f"  <url>\n    <loc>{clean_url}</loc>\n  </url>\n"
     sitemap_xml += '</urlset>'
 
     # Базовые заглушки
@@ -103,12 +105,18 @@ def download_files():
             soup = BeautifulSoup(home_html, "html.parser")
             site_text = soup.get_text(separator=' ', strip=True)[:2000]
             
-            # Умный фолбэк для сайтов на JavaScript
+            # АГРЕССИВНЫЙ ФОЛБЭК ДЛЯ ПУСТЫХ САЙТОВ (SPA/React/Vue)
             if len(site_text) < 50:
                 page_title = soup.title.string if soup.title else ""
                 meta_desc = soup.find("meta", attrs={"name": "description"})
                 desc_text = meta_desc["content"] if meta_desc else ""
-                site_text = f"Название: {page_title}. Описание: {desc_text}"
+                
+                if not page_title and not desc_text:
+                    # Если даже title пустой, берем домен
+                    domain_name = url.split('//')[-1].split('/')[0].replace('www.', '')
+                    site_text = f"Название сайта неизвестно, но домен называется '{domain_name}'. Сделай логичное предположение о тематике сайта на основе этого домена."
+                else:
+                    site_text = f"Название: {page_title}. Описание: {desc_text}"
             
             prompt = f"""
             Проанализируй текст сайта: "{site_text}" (URL: {url}).

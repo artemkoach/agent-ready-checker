@@ -1,0 +1,11 @@
+# Agent-Ready Checker
+
+> Agent-Ready Checker — это веб-инструмент с открытым исходным кодом, который анализирует и оценивает готовность любого веб-сайта к взаимодействию с AI-агентами и поисковыми системами. Он проверяет наличие ключевых файлов (llms.txt, robots.txt, agent.json, mcp.json и др.) и выдаёт оценку от 0 до 100.
+
+## Основные возможности
+- [Главная страница](https://agent-ready-checker.onrender.com/): Проверить любой сайт на готовность к AI.
+- [Исходный код на GitHub](https://github.com/artemkoach/agent-ready-checker): Полный код проекта, инструкции по установке и запуску.
+
+## Технические детали
+- [Проверяемые параметры](https://github.com/artemkoach/agent-ready-checker/blob/main/checker.py): Список всех параметров и их вес в итоговой оценке.
+- [README](https://github.com/artemkoach/agent-ready-checker/blob/main/README.md): Описание проекта, стек технологий и инструкция по локальному запуску.

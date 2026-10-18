@@ -61,7 +61,7 @@
         
         /* Стили для карточек внизу */
         .features-section { margin-top: 60px; padding-bottom: 40px; }
-        .features-title { font-size: 24px; font-weight: 600; margin-bottom: 24px; text-align: center; }
+        .features-title { font-size: 20px; font-weight: 600; margin-bottom: 24px; text-align: center; }
         .features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
         .feature-card { background: var(--card-bg); padding: 30px; border-radius: var(--radius-lg); box-shadow: var(--shadow-soft); transition: transform 0.3s ease, box-shadow 0.3s ease; }
         .feature-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-hover); }
@@ -93,7 +93,6 @@
         .badge { padding: 3px 8px; border-radius: 6px; font-size: 11px; font-weight: 600; margin-left: 8px; vertical-align: middle; letter-spacing: 0.05em; text-transform: uppercase; }
         .badge-geo { background: #e0f2fe; color: #0369a1; }
         .badge-agents { background: #f3e8ff; color: #7e22ce; }
-        /* ДОБАВЛЕН СТИЛЬ ДЛЯ КОНТЕНТА */
         .badge-content { background: #fef3c7; color: #92400e; }
 
         .badge-status { padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 700; margin-left: 6px; text-transform: uppercase; letter-spacing: 0.05em; border: 1px solid transparent; vertical-align: middle; }
@@ -130,6 +129,12 @@
     </style>
 </head>
 <body>
+    <!-- Счетчик в правом верхнем углу -->
+    <div style="position: fixed; top: 20px; right: 20px; z-index: 1000; font-size: 14px; color: var(--text-muted); display: flex; align-items: center; gap: 8px; background: white; padding: 8px 16px; border-radius: 20px; box-shadow: var(--shadow-soft);">
+        <span style="width: 8px; height: 8px; background-color: #34c759; border-radius: 50%; display: inline-block;"></span>
+        Уже проверено <b>{{ total_checks }}</b> сайтов
+    </div>
+
     <div id="loading-overlay" class="loading-overlay">
         <div class="ai-spinner"></div>
         <div class="loading-title">🤖 Нейросеть работает</div>
@@ -151,128 +156,174 @@
             </button>
         </form>
 
-        <div class="anim-fade delay-2" style="text-align: center; margin-bottom: 30px;">
-            <div style="display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 14px; color: var(--text-muted); margin-bottom: 12px;">
-                <span style="width: 8px; height: 8px; background-color: #34c759; border-radius: 50%; display: inline-block;"></span>
-                Уже проверено <b>{{ total_checks }}</b> сайтов
-            </div>
-            <a href="/demo" style="color: var(--primary-color); text-decoration: none; font-size: 15px; font-weight: 500;">Посмотреть пример отчёта (as-hedging.tilda.ws) →</a>
+        <!-- Кнопка примера отчета (справа под формой) -->
+        <div style="display: flex; justify-content: flex-end; margin-top: 10px; margin-bottom: 30px;">
+            <a href="/demo" style="display: inline-flex; align-items: center; justify-content: center; padding: 12px 24px; background: white; color: var(--text-main); text-decoration: none; font-size: 14px; font-weight: 500; border-radius: var(--radius-md); border: 1px solid rgba(0,0,0,0.1); box-shadow: var(--shadow-soft); transition: 0.2s;">Посмотреть пример отчёта</a>
         </div>
 
-    {% if error %}
-        <div class="error anim-pop">{{ error }}</div>
-    {% endif %}
+        {% if error %}
+            <div class="error anim-pop">{{ error }}</div>
+        {% endif %}
 
-    {% if result %}
-        {% if potential_gain > 0 %}
-        <div class="story-box anim-pop">
-            <h3 class="story-title">🚀 Как AI-поисковики помогут вам получать больше клиентов</h3>
-            
-            <p class="story-text">
-                Нейросети — <strong>ChatGPT, Perplexity, Claude, Gemini, Copilot, DeepSeek, Grok</strong> и другие — уже рекомендуют сайты пользователям. Но они делают это только для тех сайтов, которые технически готовы к диалогу.
-            </p>
-            
-            <p class="story-text">
-                Сейчас ваш технический балл — <strong>{{ result.score }}</strong>. Это значит, что AI-поисковики видят вас ограниченно. Если вы добавите файлы из нашего архива, он вырастет до <strong>{{ result.score + potential_gain }}</strong>. 
-                <br><br>
-                <em style="font-size: 13px;">ИИ уже проанализировал ваш сайт и сгенерировал уникальные файлы (agent.json и llms.txt) специально под ваш бизнес.</em>
-            </p>
+        {% if result %}
+            {% if potential_gain > 0 %}
+            <div class="story-box anim-pop">
+                <h3 class="story-title">🚀 Как AI-поисковики помогут вам получать больше клиентов</h3>
+                
+                <p class="story-text">
+                    Нейросети — <strong>ChatGPT, Perplexity, Claude, Gemini, Copilot, DeepSeek, Grok</strong> и другие — уже рекомендуют сайты пользователям. Но они делают это только для тех сайтов, которые технически готовы к диалогу.
+                </p>
+                
+                <p class="story-text">
+                    Сейчас ваш технический балл — <strong>{{ result.score }}</strong>. Это значит, что AI-поисковики видят вас ограниченно. Если вы добавите файлы из нашего архива, он вырастет до <strong>{{ result.score + potential_gain }}</strong>. 
+                    <br><br>
+                    <em style="font-size: 13px;">ИИ уже проанализировал ваш сайт и сгенерировал уникальные файлы (agent.json и llms.txt) специально под ваш бизнес.</em>
+                </p>
 
-            <div class="growth-visual">
-                <div class="growth-before">
-                    <div class="growth-num">{{ result.score }}</div>
-                    <div class="growth-label">Балл сейчас</div>
+                <div class="growth-visual">
+                    <div class="growth-before">
+                        <div class="growth-num">{{ result.score }}</div>
+                        <div class="growth-label">Балл сейчас</div>
+                    </div>
+                    <div class="growth-arrow">➔</div>
+                    <div class="growth-after">
+                        <div class="growth-num new">{{ result.score + potential_gain }}</div>
+                        <div class="growth-label">Новый балл</div>
+                    </div>
                 </div>
-                <div class="growth-arrow">➔</div>
-                <div class="growth-after">
-                    <div class="growth-num new">{{ result.score + potential_gain }}</div>
-                    <div class="growth-label">Новый балл</div>
+
+                <div style="background: rgba(255,255,255,0.6); padding: 15px; border-radius: 8px; margin: 15px 0; font-size: 14px;">
+                    <p style="margin: 0 0 8px 0; font-weight: 600; color: #92400e;">📈 Что это даёт на практике:</p>
+                    <ul style="margin: 0; padding-left: 20px; color: #78350f;">
+                        <li><strong>Прогноз конверсии:</strong> в перспективе до <strong>{{ conversion_lift }}x</strong> раз(а) (при условии качественного контента на сайте).</li>
+                        
+                        {% set new_score = result.score + potential_gain %}
+                        
+                        {% if new_score >= 71 %}
+                            <li><strong>Статус для AI:</strong> «Авторитетный источник». Нейросети будут активно цитировать вас в ответах, приводя «горячих» клиентов.</li>
+                        {% elif new_score >= 31 %}
+                            <li><strong>Статус для AI:</strong> «Понятный сайт». ChatGPT и Perplexity начнут регулярно считывать ваш контент и иногда рекомендовать вас.</li>
+                        {% else %}
+                            <li><strong>Статус для AI:</strong> «Базовый доступ». Вы перестанете быть «белым пятном» для нейросетей. Они начнут видеть ваш сайт.</li>
+                        {% endif %}
+                    </ul>
                 </div>
+
+                <p class="story-text" style="font-size: 13px; font-style: italic; text-align: center; margin-bottom: 20px;">
+                    *Прогноз основан на медианных данных рынка. Реальный рост зависит от вашего контента.
+                </p>
+
+                <div style="text-align: center;">
+                    <a href="/download-files?url={{ result.url }}&cms={{ result.cms }}" class="download-btn" onclick="showDownloadLoading()">
+                        📥 Скачать пакет для AI (ZIP)
+                    </a>
+                </div>
+                <p style="color: #92400e; font-size: 12px; margin-top: 12px; text-align: center; font-weight: 500;">Внутри архива: умные файлы + инструкция под ваш движок</p>
             </div>
+            {% else %}
+            <div class="success-box anim-pop">
+                <h3 class="success-title">🎉 Поздравляем! Ваш сайт полностью готов к AI</h3>
+                <p class="success-text">
+                    У вас уже есть все необходимые технические файлы для нейросетей (ChatGPT, Perplexity, Claude и других). Они могут беспрепятственно читать ваш сайт и цитировать его в своих ответах.
+                </p>
+                <p class="success-text" style="margin-top: 15px; font-size: 13px; opacity: 0.8;">
+                    Скачивать дополнительные файлы не требуется. Вы огромные молодцы!
+                </p>
+            </div>
+            {% endif %}
 
-            <div style="background: rgba(255,255,255,0.6); padding: 15px; border-radius: 8px; margin: 15px 0; font-size: 14px;">
-                <p style="margin: 0 0 8px 0; font-weight: 600; color: #92400e;">📈 Что это даёт на практике:</p>
-                <ul style="margin: 0; padding-left: 20px; color: #78350f;">
-                    <li><strong>Прогноз конверсии:</strong> в перспективе до <strong>{{ conversion_lift }}x</strong> раз(а) (при условии качественного контента на сайте).</li>
-                    
-                    {% set new_score = result.score + potential_gain %}
-                    
-                    {% if new_score >= 71 %}
-                        <li><strong>Статус для AI:</strong> «Авторитетный источник». Нейросети будут активно цитировать вас в ответах, приводя «горячих» клиентов.</li>
-                    {% elif new_score >= 31 %}
-                        <li><strong>Статус для AI:</strong> «Понятный сайт». ChatGPT и Perplexity начнут регулярно считывать ваш контент и иногда рекомендовать вас.</li>
-                    {% else %}
-                        <li><strong>Статус для AI:</strong> «Базовый доступ». Вы перестанете быть «белым пятном» для нейросетей. Они начнут видеть ваш сайт.</li>
-                    {% endif %}
+            <ul class="check-list">
+                {% for item in result.results %}
+                    <li class="check-item {{ 'pass' if item.exists else 'fail' }}" style="animation: fadeInUp 0.4s ease-out forwards; opacity: 0; animation-delay: {{ loop.index0 * 0.08 }}s;">
+                        <span style="font-weight: 500; display: flex; align-items: center; flex-wrap: wrap; gap: 6px;">
+                            {{ '✅' if item.exists else '❌' }} 
+                            {{ item.label }}
+                            
+                            {% if item.category == 'GEO' %}
+                                <span class="badge badge-geo">GEO</span>
+                            {% elif item.category == 'Агенты' %}
+                                <span class="badge badge-agents">Агенты</span>
+                            {% elif item.category == 'Контент' %}
+                                <span class="badge badge-content">Контент</span>
+                            {% endif %}
+
+                            {% if item.key in ['llms_txt', 'agent_json', 'ai_plugin', 'robots_ai', 'sitemap', 'llms_full'] %}
+                                <span class="badge-status status-ready" title="Этот файл полностью готов к работе">ГОТОВЫЙ ФАЙЛ</span>
+                            
+                            {% elif item.key in ['jsonld', 'meta_desc', 'open_graph', 'canonical', 'faq_schema'] %}
+                                <span class="badge-status status-ready" title="В архиве лежит готовый код, который нужно вставить на сайт">КОД + ИНСТРУКЦИЯ</span>
+                            
+                            {% else %}
+                                <span class="badge-status status-dev" title="Мы работаем над этим">В РАЗРАБОТКЕ</span>
+                            {% endif %}
+                        </span>
+                        <span style="color: #9ca3af; font-weight: 600; white-space: nowrap; margin-left: 10px;">+{{ item.weight }}</span>
+                    </li>
+                {% endfor %}
+            </ul>
+
+            <div class="anim-fade" style="animation-delay: {{ result.results|length * 0.08 }}s; margin-top: 40px; padding: 20px; background: white; border-radius: 12px; font-size: 14px; color: #4b5563; box-shadow: 0 2px 10px rgba(0,0,0,0.03);">
+                <p style="margin-top: 0; font-weight: 700; color: #111827; font-size: 16px;">Что это значит?</p>
+                <p style="margin-bottom: 10px;"><span style="color: #0369a1; font-weight: 700;">GEO (Generative Engine Optimization)</span> — проверки, которые помогают ChatGPT, Perplexity и Google AI Overviews найти ваш сайт и цитировать его в ответах.</p>
+                <p style="margin-bottom: 0;"><span style="color: #7e22ce; font-weight: 700;">Агенты</span> — технические файлы, которые позволяют AI-агентам не просто читать сайт, но и совершать на нем действия (например, заказывать товары или вызывать API).</p>
+            </div>
+        {% endif %}
+    </div> <!-- ЗАКРЫВАЕМ main-content (ТЕПЕРЬ НА ПРАВИЛЬНОМ МЕСТЕ) -->
+
+    <section class="features-section anim-fade">
+        <div class="features-title">Вот часть того, что мы проверим на вашем сайте (16 параметров):</div>
+        
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">🤖</div>
+                <h3>GEO (Поисковики)</h3>
+                <ul class="feature-list">
+                    <li><code>llms.txt</code> — карта для LLM</li>
+                    <li><code>robots.txt</code> — доступ для ботов</li>
+                    <li><code>sitemap.xml</code> — структура сайта</li>
                 </ul>
             </div>
 
-            <p class="story-text" style="font-size: 13px; font-style: italic; text-align: center; margin-bottom: 20px;">
-                *Прогноз основан на медианных данных рынка. Реальный рост зависит от вашего контента.
-            </p>
-
-            <div style="text-align: center;">
-                <a href="/download-files?url={{ result.url }}&cms={{ result.cms }}" class="download-btn" onclick="showDownloadLoading()">
-                    📥 Скачать пакет для AI (ZIP)
-                </a>
+            <div class="feature-card">
+                <div class="feature-icon">⚙️</div>
+                <h3>Агенты (Действия)</h3>
+                <ul class="feature-list">
+                    <li><code>agent.json</code> — возможности</li>
+                    <li><code>mcp.json</code> — протокол агентов</li>
+                    <li><code>openapi.json</code> — API сервиса</li>
+                </ul>
             </div>
-            <p style="color: #92400e; font-size: 12px; margin-top: 12px; text-align: center; font-weight: 500;">Внутри архива: умные файлы + инструкция под ваш движок</p>
+
+            <div class="feature-card">
+                <div class="feature-icon">📝</div>
+                <h3>Контент (Семантика)</h3>
+                <ul class="feature-list">
+                    <li><code>JSON-LD</code> — разметка данных</li>
+                    <li><code>FAQ Schema</code> — ответы на вопросы</li>
+                    <li><code>Open Graph</code> — превью для соцсетей</li>
+                </ul>
+            </div>
         </div>
-        {% else %}
-        <div class="success-box anim-pop">
-            <h3 class="success-title">🎉 Поздравляем! Ваш сайт полностью готов к AI</h3>
-            <p class="success-text">
-                У вас уже есть все необходимые технические файлы для нейросетей (ChatGPT, Perplexity, Claude и других). Они могут беспрепятственно читать ваш сайт и цитировать его в своих ответах.
-            </p>
-            <p class="success-text" style="margin-top: 15px; font-size: 13px; opacity: 0.8;">
-                Скачивать дополнительные файлы не требуется. Вы огромные молодцы!
-            </p>
-        </div>
-        {% endif %}
+    </section>
 
-        <ul class="check-list">
-            {% for item in result.results %}
-                <li class="check-item {{ 'pass' if item.exists else 'fail' }}" style="animation: fadeInUp 0.4s ease-out forwards; opacity: 0; animation-delay: {{ loop.index0 * 0.08 }}s;">
-                    <span style="font-weight: 500; display: flex; align-items: center; flex-wrap: wrap; gap: 6px;">
-                        {{ '✅' if item.exists else '❌' }} 
-                        {{ item.label }}
-                        
-                        {% if item.category == 'GEO' %}
-                            <span class="badge badge-geo">GEO</span>
-                        {% elif item.category == 'Агенты' %}
-                            <span class="badge badge-agents">Агенты</span>
-                        {% elif item.category == 'Контент' %}
-                            <span class="badge badge-content">Контент</span>
-                        {% endif %}
-
-                        {% if item.key in ['llms_txt', 'agent_json', 'ai_plugin', 'robots_ai', 'sitemap', 'llms_full'] %}
-                            <span class="badge-status status-ready" title="Этот файл полностью готов к работе">ГОТОВЫЙ ФАЙЛ</span>
-                        
-                        {% elif item.key in ['jsonld', 'meta_desc', 'open_graph', 'canonical', 'faq_schema'] %}
-                            <span class="badge-status status-ready" title="В архиве лежит готовый код, который нужно вставить на сайт">КОД + ИНСТРУКЦИЯ</span>
-                        
-                        {% else %}
-                            <span class="badge-status status-dev" title="Мы работаем над этим">В РАЗРАБОТКЕ</span>
-                        {% endif %}
-
-                    </span>
-                    <span style="color: #9ca3af; font-weight: 600; white-space: nowrap; margin-left: 10px;">+{{ item.weight }}</span>
-                </li>
-            {% endfor %}
-        </ul>
-
-        <div class="anim-fade" style="animation-delay: {{ result.results|length * 0.08 }}s; margin-top: 40px; padding: 20px; background: white; border-radius: 12px; font-size: 14px; color: #4b5563; box-shadow: 0 2px 10px rgba(0,0,0,0.03);">
-            <p style="margin-top: 0; font-weight: 700; color: #111827; font-size: 16px;">Что это значит?</p>
-            <p style="margin-bottom: 10px;"><span style="color: #0369a1; font-weight: 700;">GEO (Generative Engine Optimization)</span> — проверки, которые помогают ChatGPT, Perplexity и Google AI Overviews найти ваш сайт и цитировать его в ответах.</p>
-            <p style="margin-bottom: 0;"><span style="color: #7e22ce; font-weight: 700;">Агенты</span> — технические файлы, которые позволяют AI-агентам не просто читать сайт, но и совершать на нем действия (например, заказывать товары или вызывать API).</p>
-        </div>
-    {% endif %}
-
-    <div style="text-align: center; margin-top: 50px; margin-bottom: 30px;">
+    <!-- Кнопка GitHub в самом низу -->
+    <div style="text-align: center; margin-top: 40px; margin-bottom: 80px;">
         <a href="https://github.com/artemkoach/agent-ready-checker" target="_blank" style="display: inline-flex; align-items: center; gap: 8px; color: #6b7280; text-decoration: none; font-size: 14px; font-weight: 500; padding: 10px 20px; border-radius: 8px; background: white; box-shadow: 0 1px 3px rgba(0,0,0,0.05); transition: all 0.2s; border: 1px solid #e5e7eb;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.08)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 1px 3px rgba(0,0,0,0.05)'">
             <svg height="20" width="20" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path></svg>
             Смотреть исходный код на GitHub
         </a>
+    </div>
+
+    <!-- Логотип AS Hedging Lab -->
+    <div style="position: fixed; bottom: 20px; left: 20px; display: flex; flex-direction: column; z-index: 1000; pointer-events: none;">
+        <span style="font-size: 10px; color: #9ca3af; margin-bottom: 5px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em;">При поддержке</span>
+        
+        <div style="display: flex; align-items: flex-start;">
+            <span style="color: #9e2a2b; font-size: 28px; font-weight: 700; font-family: 'Playfair Display', serif; line-height: 1; letter-spacing: -1px;">AS</span>
+            <span style="color: #111827; font-size: 28px; font-weight: 400; font-family: 'Inter', sans-serif; line-height: 1; letter-spacing: -0.5px; margin-left: 2px;">Hedging</span>
+            <span style="color: #111827; font-size: 14px; font-weight: 400; font-family: 'Inter', sans-serif; line-height: 1; margin-left: 2px;">.lab</span>
+            <div style="width: 0; height: 0; border-top: 8px solid #111827; border-right: 8px solid transparent; margin-left: 5px; margin-top: 20px;"></div>
+        </div>
     </div>
 
     <script>
@@ -314,59 +365,5 @@
             }, 5000);
         }
     </script>
-        </div> <!-- ЗАКРЫВАЕМ main-content -->
-
-    <section class="features-section anim-fade">
-        <div class="features-title">Вот часть того, что мы проверим на вашем сайте:</div>
-        
-        <div class="features-grid">
-            <div class="feature-card">
-                <div class="feature-icon">🤖</div>
-                <h3>GEO (Поисковики)</h3>
-                <ul class="feature-list">
-                    <li><code>llms.txt</code> — карта для LLM</li>
-                    <li><code>robots.txt</code> — доступ для ботов</li>
-                    <li><code>sitemap.xml</code> — структура сайта</li>
-                </ul>
-            </div>
-
-            <div class="feature-card">
-                <div class="feature-icon">⚙️</div>
-                <h3>Агенты (Действия)</h3>
-                <ul class="feature-list">
-                    <li><code>agent.json</code> — возможности</li>
-                    <li><code>mcp.json</code> — протокол агентов</li>
-                    <li><code>openapi.json</code> — API сервиса</li>
-                </ul>
-            </div>
-
-            <div class="feature-card">
-                <div class="feature-icon">📝</div>
-                <h3>Контент (Семантика)</h3>
-                <ul class="feature-list">
-                    <li><code>JSON-LD</code> — разметка данных</li>
-                    <li><code>FAQ Schema</code> — ответы на вопросы</li>
-                    <li><code>Open Graph</code> — превью для соцсетей</li>
-                </ul>
-            </div>
-        </div>
-    </section>
-
-    <!-- Логотип AS Hedging Lab (ОСТАВЛЕН БЕЗ ИЗМЕНЕНИЙ) -->
-    <div style="position: fixed; bottom: 20px; left: 20px; display: flex; flex-direction: column; z-index: 1000; pointer-events: none;">
-        <span style="font-size: 10px; color: #9ca3af; margin-bottom: 5px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em;">При поддержке</span>
-        
-        <div style="display: flex; align-items: flex-start;">
-            <!-- AS -->
-            <span style="color: #9e2a2b; font-size: 28px; font-weight: 700; font-family: 'Playfair Display', serif; line-height: 1; letter-spacing: -1px;">AS</span>
-            <!-- Hedging -->
-            <span style="color: #111827; font-size: 28px; font-weight: 400; font-family: 'Inter', sans-serif; line-height: 1; letter-spacing: -0.5px; margin-left: 2px;">Hedging</span>
-            <!-- .lab -->
-            <span style="color: #111827; font-size: 14px; font-weight: 400; font-family: 'Inter', sans-serif; line-height: 1; margin-left: 2px;">.lab</span>
-            
-            <!-- Маленький черный треугольник -->
-            <div style="width: 0; height: 0; border-top: 8px solid #111827; border-right: 8px solid transparent; margin-left: 5px; margin-top: 20px;"></div>
-        </div>
-    </div>
 </body>
 </html>

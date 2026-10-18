@@ -2,6 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin, urlparse
 import sys
+import time  # <--- ДОБАВЛЕНО (для паузы между попытками)
 
 # Список проверок: (ключ, путь, описание, вес в баллах, категория)
 # Всего 16 пунктов, сумма весов = 100 баллов
@@ -25,14 +26,16 @@ AI_BOT_KEYWORDS = [
 
 HEADERS = {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"}
 
-def _fetch(url: str, timeout: int = 5): 
-    """Пробует скачать URL. Возвращает текст или None."""
-    try:
-        resp = requests.get(url, headers=HEADERS, timeout=timeout, allow_redirects=True)
-        if resp.status_code == 200 and len(resp.text.strip()) > 20:
-            return resp.text
-    except requests.RequestException:
-        pass
+# ИЗМЕНЕНО: Увеличен таймаут до 15 и добавлены 3 попытки
+def _fetch(url: str, timeout: int = 15): 
+    """Пробует скачать URL. Делает 3 попытки, если сайт тупит."""
+    for attempt in range(3):
+        try:
+            resp = requests.get(url, headers=HEADERS, timeout=timeout, allow_redirects=True)
+            if resp.status_code == 200 and len(resp.text.strip()) > 20:
+                return resp.text
+        except requests.RequestException:
+            time.sleep(1) # Ждем секунду перед следующей попыткой
     return None
 
 def _check_robots_ai(base_url: str) -> bool:

@@ -10,14 +10,40 @@ import io
 import zipfile
 from bs4 import BeautifulSoup
 import re
-from dotenv import load_dotenv  # <--- ДЛЯ ЗАГРУЗКИ КЛЮЧА ИЗ .env
+from dotenv import load_dotenv
 
-load_dotenv()  # <--- ЧИТАЕМ ФАЙЛ .env
+# --- ДИАГНОСТИКА ФАЙЛА .env ---
+env_path = os.path.join(os.getcwd(), '.env')
+print("\n=== ДИАГНОСТИКА ===")
+print("1. Папка запуска:", os.getcwd())
+print("2. Файлы в этой папке:", os.listdir('.'))
+print("3. Ищу файл по пути:", env_path)
+print("4. Файл существует?", os.path.exists(env_path))
+
+if os.path.exists(env_path):
+    with open(env_path, 'r', encoding='utf-8') as f:
+        content = f.read()
+        print("5. Содержимое файла .env:", repr(content))
+else:
+    print("5. Файл .env НЕ НАЙДЕН В ЭТОЙ ПАПКЕ!")
+
+load_dotenv(override=True)
+DEEPSEEK_KEY = os.environ.get("DEEPSEEK_API_KEY")
+print("6. Ключ прочитан?", bool(DEEPSEEK_KEY))
+print("===================\n")
 
 app = Flask(__name__)
+# ... дальше твой код
 
 # --- НАСТРОЙКА DEEPSEEK ---
-DEEPSEEK_KEY = os.environ.get("DEEPSEEK_API_KEY")  # <--- БЕЗОПАСНЫЙ КЛЮЧ
+DEEPSEEK_KEY = os.environ.get("DEEPSEEK_API_KEY")
+
+# ОТЛАДКА: Покажет в терминале, видит ли Питон ключ
+if DEEPSEEK_KEY:
+    print("✅ КЛЮЧ УСПЕШНО ЗАГРУЖЕН ИЗ .env")
+else:
+    print("❌ ОШИБКА: КЛЮЧ НЕ НАЙДЕН. ПРОВЕРЬ ФАЙЛ .env")
+
 client = OpenAI(api_key=DEEPSEEK_KEY, base_url="https://api.deepseek.com")
 
 # --- НАСТРОЙКА СЧЕТЧИКА ---

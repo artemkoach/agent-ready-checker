@@ -18,6 +18,14 @@
     </script>
 
     <style>
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes glow {
+            0%, 100% { text-shadow: 0 0 0 rgba(5, 150, 105, 0); }
+            50%      { text-shadow: 0 0 12px rgba(5, 150, 105, 0.35); }
+        }
         * { box-sizing: border-box; }
         
         :root {
@@ -53,15 +61,42 @@
         input[type="text"] { flex: 1; padding: 18px 20px 18px 48px; font-size: 16px; font-family: 'Inter', sans-serif; border: 1px solid rgba(0,0,0,0.1); border-radius: var(--radius-md); outline: none; transition: all 0.3s; background: var(--card-bg); box-shadow: var(--shadow-soft); }
         input[type="text"]:focus { border-color: var(--primary-color); box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.15); }
         
-        button { padding: 18px 32px; font-size: 16px; font-family: 'Inter', sans-serif; background: var(--primary-color); color: white; border: none; border-radius: var(--radius-md); cursor: pointer; font-weight: 600; display: flex; align-items: center; justify-content: center; min-width: 160px; transition: all 0.2s; box-shadow: var(--shadow-soft); }
-        button:hover:not(:disabled) { background: var(--primary-hover); transform: translateY(-1px); box-shadow: var(--shadow-hover); }
-        button:disabled { background: #93c5fd; cursor: not-allowed; box-shadow: none; }
+        button { 
+            padding: 18px 0;
+            width: 240px;
+            font-size: 16px; 
+            font-family: 'Inter', sans-serif; 
+            background: var(--primary-color); 
+            color: white; 
+            border: none; 
+            border-radius: var(--radius-md); 
+            cursor: pointer; 
+            font-weight: 600; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            transition: all 0.2s; 
+            box-shadow: var(--shadow-soft); 
+        }
+        button:hover:not(:disabled) { 
+            background: var(--primary-hover); 
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 6px 16px rgba(0, 113, 227, 0.3); 
+        }
+        button:active:not(:disabled) { 
+            transform: translateY(1px) scale(0.98);
+            box-shadow: 0 2px 5px rgba(0, 113, 227, 0.2); 
+        }
+        button:disabled { 
+            background: #93c5fd; 
+            cursor: not-allowed; 
+            box-shadow: none; 
+        }
 
         .info-box { background: var(--card-bg); border-radius: var(--radius-lg); padding: 24px 30px; margin-bottom: 30px; font-size: 15px; line-height: 1.6; color: var(--text-main); box-shadow: var(--shadow-soft); border: 1px solid rgba(0,0,0,0.03); text-align: center; }
         
-        /* Стили для карточек внизу */
         .features-section { margin-top: 60px; padding-bottom: 40px; }
-        .features-title { font-size: 20px; font-weight: 600; margin-bottom: 24px; text-align: center; }
+        .features-title { font-family: 'Inter', sans-serif; font-size: 15px; font-weight: 400; color: var(--text-muted); line-height: 1.6; max-width: 720px; margin: 0 auto 32px; text-align: center; }
         .features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
         .feature-card { background: var(--card-bg); padding: 30px; border-radius: var(--radius-lg); box-shadow: var(--shadow-soft); transition: transform 0.3s ease, box-shadow 0.3s ease; }
         .feature-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-hover); }
@@ -75,7 +110,10 @@
             h1 { font-size: 32px; }
             form { flex-direction: column; }
             button { width: 100%; }
+            .btn-premium { width: 100%; }
             .features-grid { grid-template-columns: 1fr; }
+            .check-item { grid-template-columns: 1fr; gap: 4px; }
+            .check-points { text-align: left; }
         }
 
         .score-box { background: white; padding: 30px 20px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.04); margin-bottom: 25px; text-align: center; border: 1px solid #f3f4f6; }
@@ -83,22 +121,26 @@
         .score-out-of { font-size: 24px; color: #9ca3af; font-weight: 600; font-family: 'Inter', sans-serif; }
         
         .check-list { list-style: none; padding: 0; }
-        .check-item { background: white; padding: 16px 20px; margin-bottom: 8px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 1px 3px rgba(0,0,0,0.04); transition: transform 0.2s, box-shadow 0.2s; border: 1px solid transparent; }
+        .check-item { background: white; padding: 16px 20px; margin-bottom: 8px; border-radius: 8px; display: grid; grid-template-columns: minmax(0,1fr) 160px 90px 210px 55px; align-items: center; gap: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); transition: transform 0.2s, box-shadow 0.2s; border: 1px solid transparent; }
         .check-item:hover { transform: translateX(4px); box-shadow: 0 4px 12px rgba(0,0,0,0.06); border-color: #e5e7eb; }
+        .check-name { font-weight: 500; font-size: 15px; }
+        .check-points { color: #9ca3af; font-weight: 600; white-space: nowrap; text-align: right; }
         
         .pass { border-left: 4px solid #10b981; }
         .fail { border-left: 4px solid #ef4444; }
         .error { background: #fef2f2; color: #991b1b; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #fecaca; }
         
-        .badge { padding: 3px 8px; border-radius: 6px; font-size: 11px; font-weight: 600; margin-left: 8px; vertical-align: middle; letter-spacing: 0.05em; text-transform: uppercase; }
+        .badge { padding: 3px 8px; border-radius: 6px; font-size: 11px; font-weight: 600; text-align: center; letter-spacing: 0.05em; text-transform: uppercase; }
         .badge-geo { background: #e0f2fe; color: #0369a1; }
         .badge-agents { background: #f3e8ff; color: #7e22ce; }
         .badge-content { background: #fef3c7; color: #92400e; }
 
-        .badge-status { padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 700; margin-left: 6px; text-transform: uppercase; letter-spacing: 0.05em; border: 1px solid transparent; vertical-align: middle; }
+        .badge-status { padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 700; text-align: center; text-transform: uppercase; letter-spacing: 0.05em; border: 1px solid transparent; }
         .status-ready { background: #d1fae5; color: #065f46; border-color: #a7f3d0; }
         .status-template { background: #fef3c7; color: #92400e; border-color: #fde68a; }
         .status-dev { background: #f3f4f6; color: #4b5563; border-color: #e5e7eb; }
+        .status-have { background: #d1fae5; color: #065f46; border-color: #6ee7b7; }
+        .status-need { background: #fef3c7; color: #92400e; border-color: #fde68a; }
 
         .story-box { background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%); border: 1px solid #fcd34d; padding: 30px; border-radius: 12px; margin-bottom: 25px; box-shadow: 0 10px 25px -5px rgba(251, 191, 36, 0.2); position: relative; overflow: hidden; }
         .story-title { font-weight: 700; color: #92400e; font-size: 20px; margin-top: 0; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; }
@@ -126,10 +168,39 @@
         .loading-title { font-size: 24px; font-weight: 700; color: #111827; margin-bottom: 10px; }
         .loading-dynamic { font-size: 16px; color: #4b5563; font-weight: 500; height: 24px; margin-bottom: 20px; }
         .loading-note { font-size: 13px; color: #9ca3af; max-width: 300px; text-align: center; line-height: 1.4; }
+
+        .btn-premium {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 240px;
+            padding: 12px 0;
+            white-space: nowrap;
+            background: white;
+            color: var(--text-main);
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: var(--radius-md);
+            border: 1.5px solid rgba(0, 113, 227, 0.3);
+            transition: all 0.2s; 
+            box-shadow: var(--shadow-soft); 
+            cursor: pointer;
+        }
+        .btn-premium:hover {
+            background: #f0f7ff;
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 6px 16px rgba(0, 113, 227, 0.15);
+        }
+        .btn-premium:active {
+            transform: translateY(1px) scale(0.98);
+            box-shadow: 0 2px 5px rgba(0, 113, 227, 0.1);
+        }
     </style>
 </head>
 <body>
-    <!-- СЧЕТЧИК В ПРАВОМ ВЕРХНЕМ УГЛУ (ИЗМЕНЕНО) -->
     <div style="position: fixed; top: 20px; right: 20px; z-index: 1000; font-size: 14px; color: var(--text-muted); display: flex; align-items: center; gap: 8px; background: white; padding: 8px 16px; border-radius: 20px; box-shadow: var(--shadow-soft);">
         <span style="width: 8px; height: 8px; background-color: #34c759; border-radius: 50%; display: inline-block;"></span>
         Уже проверено <b>{{ total_checks }}</b> сайтов
@@ -156,9 +227,8 @@
             </button>
         </form>
 
-        <!-- КНОПКА ПРИМЕРА ОТЧЕТА СПРАВА ПОД ФОРМОЙ (ИЗМЕНЕНО) -->
         <div style="display: flex; justify-content: flex-end; margin-top: 10px; margin-bottom: 30px;">
-            <a href="/demo" style="display: inline-flex; align-items: center; justify-content: center; padding: 12px 24px; background: white; color: var(--text-main); text-decoration: none; font-size: 14px; font-weight: 500; border-radius: var(--radius-md); border: 1px solid rgba(0,0,0,0.1); box-shadow: var(--shadow-soft); transition: 0.2s;">Посмотреть пример отчёта</a>
+            <a href="/demo" class="btn-premium">Посмотреть пример отчёта</a>
         </div>
 
         {% if error %}
@@ -235,29 +305,31 @@
             <ul class="check-list">
                 {% for item in result.results %}
                     <li class="check-item {{ 'pass' if item.exists else 'fail' }}" style="animation: fadeInUp 0.4s ease-out forwards; opacity: 0; animation-delay: {{ loop.index0 * 0.08 }}s;">
-                        <span style="font-weight: 500; display: flex; align-items: center; flex-wrap: wrap; gap: 6px;">
-                            {{ '✅' if item.exists else '❌' }} 
-                            {{ item.label }}
-                            
-                            {% if item.category == 'GEO' %}
-                                <span class="badge badge-geo">GEO</span>
-                            {% elif item.category == 'Агенты' %}
-                                <span class="badge badge-agents">Агенты</span>
-                            {% elif item.category == 'Контент' %}
-                                <span class="badge badge-content">Контент</span>
-                            {% endif %}
+                        <span class="check-name">{{ '✅' if item.exists else '❌' }} {{ item.label }}</span>
 
-                            {% if item.key in ['llms_txt', 'agent_json', 'ai_plugin', 'robots_ai', 'sitemap', 'llms_full'] %}
-                                <span class="badge-status status-ready" title="Этот файл полностью готов к работе">ГОТОВЫЙ ФАЙЛ</span>
-                            
-                            {% elif item.key in ['jsonld', 'meta_desc', 'open_graph', 'canonical', 'faq_schema'] %}
-                                <span class="badge-status status-ready" title="В архиве лежит готовый код, который нужно вставить на сайт">КОД + ИНСТРУКЦИЯ</span>
-                            
+                        <span class="badge-status {{ 'status-have' if item.exists else 'status-need' }}">{{ 'УЖЕ НАСТРОЕНО' if item.exists else 'МОЖЕМ УЛУЧШИТЬ' }}</span>
+
+                        {% if item.category == 'GEO' %}
+                            <span class="badge badge-geo">GEO</span>
+                        {% elif item.category == 'Агенты' %}
+                            <span class="badge badge-agents">Агенты</span>
+                        {% elif item.category == 'Контент' %}
+                            <span class="badge badge-content">Контент</span>
+                        {% else %}
+                            <span></span>
+                        {% endif %}
+
+                        {% if not item.exists %}
+                            {% if item.key in ['llms_txt', 'agent_json', 'ai_plugin', 'robots_ai', 'sitemap', 'llms_full', 'jsonld', 'meta_desc', 'open_graph', 'canonical', 'faq_schema'] %}
+                                <span class="badge-status status-ready">ФАЙЛ ГОТОВ</span>
                             {% else %}
-                                <span class="badge-status status-dev" title="Мы работаем над этим">В РАЗРАБОТКЕ</span>
+                                <span class="badge-status status-dev">В РАЗРАБОТКЕ</span>
                             {% endif %}
-                        </span>
-                        <span style="color: #9ca3af; font-weight: 600; white-space: nowrap; margin-left: 10px;">+{{ item.weight }}</span>
+                        {% else %}
+                            <span></span>
+                        {% endif %}
+
+                        <span class="check-points">+{{ item.weight }}</span>
                     </li>
                 {% endfor %}
             </ul>
@@ -268,11 +340,10 @@
                 <p style="margin-bottom: 0;"><span style="color: #7e22ce; font-weight: 700;">Агенты</span> — технические файлы, которые позволяют AI-агентам не просто читать сайт, но и совершать на нем действия (например, заказывать товары или вызывать API).</p>
             </div>
         {% endif %}
-    </div> <!-- ЗАКРЫВАЕМ main-content (ТЕПЕРЬ НА ПРАВИЛЬНОМ МЕСТЕ) -->
+    </div>
 
     <section class="features-section anim-fade">
-        <!-- ЗАГОЛОВОК С 16 ПАРАМЕТРАМИ (ИЗМЕНЕНО) -->
-        <div class="features-title">Вот часть того, что мы проверим на вашем сайте (16 параметров):</div>
+        <div class="features-title">Ниже — 16 параметров проверки сайта на готовность к работе с AI-поисковиками и агентами. Ещё более 30 параметров — в разработке.</div>
         
         <div class="features-grid">
             <div class="feature-card">
@@ -307,15 +378,13 @@
         </div>
     </section>
 
-    <!-- КНОПКА GITHUB В САМОМ НИЗУ (ИЗМЕНЕНО) -->
-    <div style="text-align: center; margin-top: 40px; margin-bottom: 80px;">
-        <a href="https://github.com/artemkoach/agent-ready-checker" target="_blank" style="display: inline-flex; align-items: center; gap: 8px; color: #6b7280; text-decoration: none; font-size: 14px; font-weight: 500; padding: 10px 20px; border-radius: 8px; background: white; box-shadow: 0 1px 3px rgba(0,0,0,0.05); transition: all 0.2s; border: 1px solid #e5e7eb;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.08)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 1px 3px rgba(0,0,0,0.05)'">
+    <div style="position: fixed; bottom: 20px; right: 20px; z-index: 1000;">
+        <a href="https://github.com/artemkoach/agent-ready-checker" target="_blank" style="display: inline-flex; align-items: center; gap: 8px; color: #6b7280; text-decoration: none; font-size: 14px; font-weight: 500; padding: 10px 20px; border-radius: 8px; background: white; box-shadow: 0 4px 12px rgba(0,0,0,0.1); transition: all 0.2s; border: 1px solid #e5e7eb;" onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 8px 20px rgba(0,0,0,0.15)'; this.style.color='#111827';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.1)'; this.style.color='#6b7280';">
             <svg height="20" width="20" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path></svg>
             Смотреть исходный код на GitHub
         </a>
     </div>
 
-    <!-- Логотип AS Hedging Lab -->
     <div style="position: fixed; bottom: 20px; left: 20px; display: flex; flex-direction: column; z-index: 1000; pointer-events: none;">
         <span style="font-size: 10px; color: #9ca3af; margin-bottom: 5px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em;">При поддержке</span>
         

@@ -32,11 +32,27 @@
 
         .checks-title { font-size: 20px; font-weight: 600; margin: 40px 0 20px; }
         .check-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
-        .check-item { background: var(--card-bg); padding: 16px 20px; border-radius: var(--radius-md); box-shadow: var(--shadow-soft); display: flex; justify-content: space-between; align-items: center; border-left: 4px solid transparent; }
+        .check-item { background: var(--card-bg); padding: 16px 20px; border-radius: var(--radius-md); box-shadow: var(--shadow-soft); display: grid; grid-template-columns: minmax(0,1fr) 160px 90px 210px 55px; align-items: center; gap: 10px; border-left: 4px solid transparent; }
         .check-item.pass { border-left-color: #10b981; }
         .check-item.fail { border-left-color: #ef4444; }
         .check-name { font-weight: 500; font-size: 15px; }
-        .check-points { font-weight: 600; color: var(--text-muted); }
+        .check-points { font-weight: 600; color: var(--text-muted); white-space: nowrap; text-align: right; }
+
+        .badge { padding: 3px 8px; border-radius: 6px; font-size: 11px; font-weight: 600; text-align: center; letter-spacing: 0.05em; text-transform: uppercase; }
+        .badge-geo { background: #e0f2fe; color: #0369a1; }
+        .badge-agents { background: #f3e8ff; color: #7e22ce; }
+        .badge-content { background: #fef3c7; color: #92400e; }
+
+        .badge-status { padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 700; text-align: center; text-transform: uppercase; letter-spacing: 0.05em; border: 1px solid transparent; }
+        .status-ready { background: #d1fae5; color: #065f46; border-color: #a7f3d0; }
+        .status-dev { background: #f3f4f6; color: #4b5563; border-color: #e5e7eb; }
+        .status-have { background: #d1fae5; color: #065f46; border-color: #6ee7b7; }
+        .status-need { background: #fef3c7; color: #92400e; border-color: #fde68a; }
+
+        @media (max-width: 768px) {
+            .check-item { grid-template-columns: 1fr; gap: 4px; }
+            .check-points { text-align: left; }
+        }
     </style>
 </head>
 <body>
@@ -65,47 +81,119 @@
             <a href="#" class="download-btn">📥 Скачать пакет для AI (ZIP)</a>
         </div>
 
-        <div class="checks-title">Что проверено (часть списка):</div>
+        <div class="checks-title">Что проверено (16 параметров):</div>
         <ul class="check-list">
-            <li class="check-item pass">
-                <span class="check-name">✅ sitemap.xml (Карта сайта)</span>
-                <span class="check-points">+5</span>
-            </li>
-            <li class="check-item pass">
-                <span class="check-name">✅ H1 (Главный заголовок)</span>
-                <span class="check-points">+5</span>
-            </li>
-            <li class="check-item pass">
-                <span class="check-name">✅ Meta Description (Описание для AI)</span>
-                <span class="check-points">+5</span>
-            </li>
-            <li class="check-item pass">
-                <span class="check-name">✅ Open Graph (Превью для соцсетей)</span>
-                <span class="check-points">+5</span>
-            </li>
-            <li class="check-item pass">
-                <span class="check-name">✅ Canonical (Защита от дублей)</span>
-                <span class="check-points">+5</span>
-            </li>
             <li class="check-item fail">
-                <span class="check-name">❌ llms.txt (Карта для LLM)</span>
+                <span class="check-name">❌ llms.txt (карта для AI)</span>
+                <span class="badge-status status-need">МОЖЕМ УЛУЧШИТЬ</span>
+                <span class="badge badge-geo">GEO</span>
+                <span class="badge-status status-ready">ФАЙЛ ГОТОВ</span>
                 <span class="check-points">+15</span>
             </li>
             <li class="check-item fail">
-                <span class="check-name">❌ robots.txt (Правила для ботов)</span>
+                <span class="check-name">❌ robots.txt (правила для AI-ботов)</span>
+                <span class="badge-status status-need">МОЖЕМ УЛУЧШИТЬ</span>
+                <span class="badge badge-geo">GEO</span>
+                <span class="badge-status status-ready">ФАЙЛ ГОТОВ</span>
                 <span class="check-points">+10</span>
             </li>
-            <li class="check-item fail">
-                <span class="check-name">❌ agent.json (Описание возможностей)</span>
-                <span class="check-points">+10</span>
-            </li>
-            <li class="check-item fail">
-                <span class="check-name">❌ JSON-LD (Структурированные данные)</span>
+            <li class="check-item pass">
+                <span class="check-name">✅ sitemap.xml (карта сайта)</span>
+                <span class="badge-status status-have">УЖЕ НАСТРОЕНО</span>
+                <span class="badge badge-geo">GEO</span>
+                <span></span>
                 <span class="check-points">+5</span>
             </li>
             <li class="check-item fail">
-                <span class="check-name">❌ FAQ Schema (Ответы на вопросы)</span>
+                <span class="check-name">❌ llms-full.txt (расширенная карта)</span>
+                <span class="badge-status status-need">МОЖЕМ УЛУЧШИТЬ</span>
+                <span class="badge badge-geo">GEO</span>
+                <span class="badge-status status-ready">ФАЙЛ ГОТОВ</span>
+                <span class="check-points">+5</span>
+            </li>
+            <li class="check-item fail">
+                <span class="check-name">❌ agent.json (описание возможностей)</span>
+                <span class="badge-status status-need">МОЖЕМ УЛУЧШИТЬ</span>
+                <span class="badge badge-agents">Агенты</span>
+                <span class="badge-status status-ready">ФАЙЛ ГОТОВ</span>
                 <span class="check-points">+10</span>
+            </li>
+            <li class="check-item fail">
+                <span class="check-name">❌ mcp.json (MCP-эндпоинт)</span>
+                <span class="badge-status status-need">МОЖЕМ УЛУЧШИТЬ</span>
+                <span class="badge badge-agents">Агенты</span>
+                <span class="badge-status status-dev">В РАЗРАБОТКЕ</span>
+                <span class="check-points">+5</span>
+            </li>
+            <li class="check-item fail">
+                <span class="check-name">❌ ai-plugin.json (старый стандарт)</span>
+                <span class="badge-status status-need">МОЖЕМ УЛУЧШИТЬ</span>
+                <span class="badge badge-agents">Агенты</span>
+                <span class="badge-status status-ready">ФАЙЛ ГОТОВ</span>
+                <span class="check-points">+5</span>
+            </li>
+            <li class="check-item fail">
+                <span class="check-name">❌ openapi.json (API для агентов)</span>
+                <span class="badge-status status-need">МОЖЕМ УЛУЧШИТЬ</span>
+                <span class="badge badge-agents">Агенты</span>
+                <span class="badge-status status-dev">В РАЗРАБОТКЕ</span>
+                <span class="check-points">+5</span>
+            </li>
+            <li class="check-item fail">
+                <span class="check-name">❌ JSON-LD (структурированные данные)</span>
+                <span class="badge-status status-need">МОЖЕМ УЛУЧШИТЬ</span>
+                <span class="badge badge-geo">GEO</span>
+                <span class="badge-status status-ready">ФАЙЛ ГОТОВ</span>
+                <span class="check-points">+5</span>
+            </li>
+            <li class="check-item pass">
+                <span class="check-name">✅ FAQ Schema (ответы на вопросы)</span>
+                <span class="badge-status status-have">УЖЕ НАСТРОЕНО</span>
+                <span class="badge badge-content">Контент</span>
+                <span></span>
+                <span class="check-points">+10</span>
+            </li>
+            <li class="check-item pass">
+                <span class="check-name">✅ Meta Description (описание для AI)</span>
+                <span class="badge-status status-have">УЖЕ НАСТРОЕНО</span>
+                <span class="badge badge-content">Контент</span>
+                <span></span>
+                <span class="check-points">+5</span>
+            </li>
+            <li class="check-item pass">
+                <span class="check-name">✅ Open Graph (превью для соцсетей)</span>
+                <span class="badge-status status-have">УЖЕ НАСТРОЕНО</span>
+                <span class="badge badge-content">Контент</span>
+                <span></span>
+                <span class="check-points">+5</span>
+            </li>
+            <li class="check-item pass">
+                <span class="check-name">✅ Canonical (защита от дублей)</span>
+                <span class="badge-status status-have">УЖЕ НАСТРОЕНО</span>
+                <span class="badge badge-content">Контент</span>
+                <span></span>
+                <span class="check-points">+5</span>
+            </li>
+            <li class="check-item pass">
+                <span class="check-name">✅ H1 (правильный главный заголовок)</span>
+                <span class="badge-status status-have">УЖЕ НАСТРОЕНО</span>
+                <span class="badge badge-content">Контент</span>
+                <span></span>
+                <span class="check-points">+5</span>
+            </li>
+            <li class="check-item fail">
+                <span class="check-name">❌ Даты публикации (свежесть)</span>
+                <span class="badge-status status-need">МОЖЕМ УЛУЧШИТЬ</span>
+                <span class="badge badge-content">Контент</span>
+                <span class="badge-status status-dev">В РАЗРАБОТКЕ</span>
+                <span class="check-points">+3</span>
+            </li>
+            <li class="check-item fail">
+                <span class="check-name">❌ Alt-текст изображений</span>
+                <span class="badge-status status-need">МОЖЕМ УЛУЧШИТЬ</span>
+                <span class="badge badge-content">Контент</span>
+                <span class="badge-status status-dev">В РАЗРАБОТКЕ</span>
+                <span class="check-points">+2</span>
             </li>
         </ul>
     </div>

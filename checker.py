@@ -155,16 +155,26 @@ def check_url(base_url: str) -> dict:
 
         # Определение CMS
         html_lower = home_html.lower()
-        if "wp-content" in html_lower or "wordpress" in html_lower:
+        if "wp-content" in html_lower or "/wp-includes/" in html_lower:
             cms = "WordPress"
-        elif "tilda" in html_lower:
+        elif "tildacdn" in html_lower or "tilda.ws" in html_lower:
             cms = "Tilda"
-        elif "bitrix" in html_lower:
+        elif "/bitrix/" in html_lower or "bitrix24." in html_lower:
             cms = "1C-Bitrix"
-        elif "shopify" in html_lower:
+        elif "cdn.shopify.com" in html_lower or "shopify-section" in html_lower or "shopify.theme" in html_lower:
             cms = "Shopify"
-        elif "wix.com" in html_lower:
+        elif "wixstatic" in html_lower or "wix.com" in html_lower:
             cms = "Wix"
+        elif "/media/system/js/" in html_lower or "/components/com_" in html_lower or "joomla" in html_lower:
+            cms = "Joomla"
+        elif "drupal" in html_lower or "/sites/default/files/" in html_lower or "drupal.settings" in html_lower:
+            cms = "Drupal"
+        elif "opencart" in html_lower or "catalog/view/theme" in html_lower:
+            cms = "OpenCart"
+        elif "prestashop" in html_lower or "var prestashop" in html_lower:
+            cms = "PrestaShop"
+        elif "craftum" in html_lower or "ukit" in html_lower or "nethouse" in html_lower:
+            cms = "Builder"
             
         extracted_links = _extract_links(home_html, base_url)
 

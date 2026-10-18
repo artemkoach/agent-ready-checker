@@ -19,31 +19,64 @@
 
     <style>
         * { box-sizing: border-box; }
-        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; max-width: 700px; margin: 40px auto; padding: 0 20px; background: #f9fafb; color: #1f2937; line-height: 1.5; }
         
-        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes popIn { 0% { opacity: 0; transform: scale(0.9); } 100% { opacity: 1; transform: scale(1); } }
-        @keyframes glow { 0% { box-shadow: 0 0 0 0 rgba(234, 179, 8, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(234, 179, 8, 0); } 100% { box-shadow: 0 0 0 0 rgba(234, 179, 8, 0); } }
+        :root {
+            --bg-color: #f5f5f7;
+            --text-main: #1d1d1f;
+            --text-muted: #86868b;
+            --primary-color: #0071e3;
+            --primary-hover: #0077ed;
+            --card-bg: #ffffff;
+            --radius-lg: 20px;
+            --radius-md: 12px;
+            --shadow-soft: 0 4px 24px rgba(0, 0, 0, 0.04);
+            --shadow-hover: 0 8px 32px rgba(0, 0, 0, 0.08);
+        }
+
+        body { 
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; 
+            max-width: 1000px; 
+            margin: 0 auto; 
+            padding: 40px 20px; 
+            background: var(--bg-color); 
+            color: var(--text-main); 
+            line-height: 1.5; 
+            -webkit-font-smoothing: antialiased;
+        }
         
-        .anim-fade { animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; }
-        .anim-pop { animation: popIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; }
-        .delay-1 { animation-delay: 0.1s; }
-        .delay-2 { animation-delay: 0.2s; }
+        .main-content { max-width: 750px; margin: 0 auto; }
+
+        h1 { margin-bottom: 15px; font-weight: 700; letter-spacing: -1px; font-size: 42px; line-height: 1.1; text-align: center; }
+        p.subtitle { color: var(--text-muted); margin-top: 0; margin-bottom: 30px; font-size: 18px; font-weight: 400; text-align: center; }
         
-        h1 { margin-bottom: 5px; font-weight: 700; letter-spacing: -0.02em; }
-        p.subtitle { color: #6b7280; margin-top: 0; margin-bottom: 25px; font-size: 16px; font-weight: 400; }
+        form { display: flex; gap: 12px; margin-bottom: 20px; }
+        input[type="text"] { flex: 1; padding: 18px 20px 18px 48px; font-size: 16px; font-family: 'Inter', sans-serif; border: 1px solid rgba(0,0,0,0.1); border-radius: var(--radius-md); outline: none; transition: all 0.3s; background: var(--card-bg); box-shadow: var(--shadow-soft); }
+        input[type="text"]:focus { border-color: var(--primary-color); box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.15); }
         
-        .info-box { background: #eff6ff; border-left: 4px solid #3b82f6; padding: 15px 20px; border-radius: 6px; margin-bottom: 30px; font-size: 14px; line-height: 1.6; color: #1e3a8a; }
-        .info-box strong { color: #1d4ed8; }
-        
-        form { display: flex; gap: 10px; margin-bottom: 30px; }
-        input[type="text"] { flex: 1; padding: 12px 16px; font-size: 16px; font-family: 'Inter', sans-serif; border: 1px solid #d1d5db; border-radius: 8px; outline: none; transition: all 0.2s; }
-        input[type="text"]:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.15); transform: translateY(-1px); }
-        
-        button { padding: 12px 24px; font-size: 16px; font-family: 'Inter', sans-serif; background: #2563eb; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; display: flex; align-items: center; justify-content: center; min-width: 140px; transition: all 0.2s; box-shadow: 0 2px 4px rgba(37,99,235,0.2); }
-        button:hover:not(:disabled) { background: #1d4ed8; transform: translateY(-1px); box-shadow: 0 4px 8px rgba(37,99,235,0.3); }
-        button:active:not(:disabled) { transform: translateY(1px); box-shadow: 0 1px 2px rgba(37,99,235,0.2); }
+        button { padding: 18px 32px; font-size: 16px; font-family: 'Inter', sans-serif; background: var(--primary-color); color: white; border: none; border-radius: var(--radius-md); cursor: pointer; font-weight: 600; display: flex; align-items: center; justify-content: center; min-width: 160px; transition: all 0.2s; box-shadow: var(--shadow-soft); }
+        button:hover:not(:disabled) { background: var(--primary-hover); transform: translateY(-1px); box-shadow: var(--shadow-hover); }
         button:disabled { background: #93c5fd; cursor: not-allowed; box-shadow: none; }
+
+        .info-box { background: var(--card-bg); border-radius: var(--radius-lg); padding: 24px 30px; margin-bottom: 30px; font-size: 15px; line-height: 1.6; color: var(--text-main); box-shadow: var(--shadow-soft); border: 1px solid rgba(0,0,0,0.03); text-align: center; }
+        
+        /* Стили для карточек внизу */
+        .features-section { margin-top: 60px; padding-bottom: 40px; }
+        .features-title { font-size: 24px; font-weight: 600; margin-bottom: 24px; text-align: center; }
+        .features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+        .feature-card { background: var(--card-bg); padding: 30px; border-radius: var(--radius-lg); box-shadow: var(--shadow-soft); transition: transform 0.3s ease, box-shadow 0.3s ease; }
+        .feature-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-hover); }
+        .feature-icon { font-size: 28px; margin-bottom: 12px; }
+        .feature-card h3 { font-size: 17px; font-weight: 600; margin-bottom: 16px; margin-top: 0; }
+        .feature-list { list-style: none; padding: 0; margin: 0; }
+        .feature-list li { font-size: 14px; color: var(--text-muted); margin-bottom: 10px; display: flex; align-items: center; }
+        .feature-list code { background: #f5f5f7; padding: 2px 6px; border-radius: 6px; font-family: monospace; color: var(--text-main); margin-right: 8px; font-size: 13px; }
+        
+        @media (max-width: 768px) {
+            h1 { font-size: 32px; }
+            form { flex-direction: column; }
+            button { width: 100%; }
+            .features-grid { grid-template-columns: 1fr; }
+        }
 
         .score-box { background: white; padding: 30px 20px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.04); margin-bottom: 25px; text-align: center; border: 1px solid #f3f4f6; }
         .score-number { font-family: 'Playfair Display', serif; font-size: 64px; font-weight: 700; color: #111827; line-height: 1; margin: 10px 0; }
@@ -104,25 +137,31 @@
         <div class="loading-note">ИИ анализирует контент и генерирует файлы. Пожалуйста, подождите 5–10 секунд.</div>
     </div>
 
-    <div class="anim-fade" style="text-align: right; font-size: 13px; color: #9ca3af; margin-bottom: 10px; font-weight: 500;">
-        Всего проверок сделано: <strong style="color: #2563eb;">{{ total_checks }}</strong>
-    </div>
+    <div class="main-content">
+        <div class="anim-fade">
+            <h1>Проверка готовности сайта к AI-поисковикам</h1>
+            <p class="subtitle">Узнайте, находят ли вас ChatGPT, Claude и Perplexity и другие ИИ. Получите оценку от 0 до 100 и готовые файлы для исправления.</p>
+        </div>
 
-    <div class="anim-fade">
-        <h1>Agent-Ready Checker</h1>
-        <p class="subtitle">Проверьте, готов ли ваш сайт к приходу AI-агентов и GEO-продвижению.</p>
-    </div>
+        <form method="POST" id="checker-form" onsubmit="showLoading()" class="anim-fade delay-2" style="position: relative;">
+            <div style="position: absolute; left: 18px; top: 50%; transform: translateY(-50%); font-size: 18px; opacity: 0.5; pointer-events: none;">🌐</div>
+            <input type="text" name="url" placeholder="Введите адрес сайта (например, amvera.ru)" value="{{ request.form.url or '' }}" required>
+            <button type="submit" id="submit-btn">
+                <span id="btn-text">Проверить бесплатно</span>
+            </button>
+        </form>
 
-    <div class="info-box anim-fade delay-1">
-        <strong>Зачем это нужно?</strong> Нейросети (ChatGPT, Claude, Perplexity) уже ищут информацию в интернете. Чтобы они находили и цитировали ваш сайт, он должен быть к этому готов технически. Введите адрес сайта, чтобы узнать его оценку от 0 до 100 и получить список того, что нужно доработать.
-    </div>
+        <div class="anim-fade delay-2" style="text-align: center; margin-bottom: 30px;">
+            <div style="display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 14px; color: var(--text-muted); margin-bottom: 12px;">
+                <span style="width: 8px; height: 8px; background-color: #34c759; border-radius: 50%; display: inline-block;"></span>
+                Уже проверено <b>{{ total_checks }}</b> сайтов
+            </div>
+            <a href="/demo" style="color: var(--primary-color); text-decoration: none; font-size: 15px; font-weight: 500;">Посмотреть пример отчёта (as-hedging.tilda.ws) →</a>
+        </div>
 
-    <form method="POST" id="checker-form" onsubmit="showLoading()" class="anim-fade delay-2">
-        <input type="text" name="url" placeholder="example.com" value="{{ request.form.url or '' }}" required>
-        <button type="submit" id="submit-btn">
-            <span id="btn-text">Проверить</span>
-        </button>
-    </form>
+        <div class="info-box anim-fade delay-1">
+            <strong style="color: var(--text-main);">Зачем это нужно?</strong> Нейросети (ChatGPT, Claude, Perplexity) уже ищут информацию в интернете. Чтобы они находили и цитировали ваш сайт, он должен быть к этому готов технически.
+        </div>
 
     {% if error %}
         <div class="error anim-pop">{{ error }}</div>
@@ -279,7 +318,44 @@
             }, 5000);
         }
     </script>
-    
+        </div> <!-- ЗАКРЫВАЕМ main-content -->
+
+    <section class="features-section anim-fade">
+        <div class="features-title">Вот часть того, что мы проверим на вашем сайте:</div>
+        
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">🤖</div>
+                <h3>GEO (Поисковики)</h3>
+                <ul class="feature-list">
+                    <li><code>llms.txt</code> — карта для LLM</li>
+                    <li><code>robots.txt</code> — доступ для ботов</li>
+                    <li><code>sitemap.xml</code> — структура сайта</li>
+                </ul>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">⚙️</div>
+                <h3>Агенты (Действия)</h3>
+                <ul class="feature-list">
+                    <li><code>agent.json</code> — возможности</li>
+                    <li><code>mcp.json</code> — протокол агентов</li>
+                    <li><code>openapi.json</code> — API сервиса</li>
+                </ul>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">📝</div>
+                <h3>Контент (Семантика)</h3>
+                <ul class="feature-list">
+                    <li><code>JSON-LD</code> — разметка данных</li>
+                    <li><code>FAQ Schema</code> — ответы на вопросы</li>
+                    <li><code>Open Graph</code> — превью для соцсетей</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
     <!-- Логотип AS Hedging Lab (ОСТАВЛЕН БЕЗ ИЗМЕНЕНИЙ) -->
     <div style="position: fixed; bottom: 20px; left: 20px; display: flex; flex-direction: column; z-index: 1000; pointer-events: none;">
         <span style="font-size: 10px; color: #9ca3af; margin-bottom: 5px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em;">При поддержке</span>

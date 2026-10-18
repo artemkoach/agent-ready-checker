@@ -76,6 +76,9 @@ def index():
     return render_template("index.html", result=result, error=error, 
                            total_checks=current_total, potential_gain=potential_gain,
                            conversion_lift=conversion_lift)
+@app.route("/demo")
+def demo():
+    return render_template("demo.html")
 
 @app.route("/download-files")
 def download_files():
@@ -85,7 +88,9 @@ def download_files():
         return "URL is required", 400
 
     home_html = _fetch(url)
-    links = _extract_links(home_html, url) if home_html else [f"- [Главная]({url}): Главная страница"]
+    links = _extract_links(home_html, url) if home_html else []
+    if not links:
+        links = [f"- [Главная]({url}): Главная страница"]
     
     # --- ГЕНЕРАЦИЯ SITEMAP.XML (С ОЧИСТКОЙ ОТ UTM) ---
     sitemap_xml = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'

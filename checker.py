@@ -25,7 +25,7 @@ AI_BOT_KEYWORDS = [
 
 HEADERS = {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"}
 
-def _fetch(url: str, timeout: int = 3): 
+def _fetch(url: str, timeout: int = 5): 
     """Пробует скачать URL. Возвращает текст или None."""
     try:
         resp = requests.get(url, headers=HEADERS, timeout=timeout, allow_redirects=True)

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Пример отчета - Agent-Ready Checker</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #f5f5f7; --text-main: #1d1d1f; --text-muted: #86868b;
+            --primary-color: #0071e3; --card-bg: #ffffff; --radius-lg: 20px; --radius-md: 12px;
+            --shadow-soft: 0 4px 24px rgba(0, 0, 0, 0.04);
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg-color); color: var(--text-main); line-height: 1.5; padding: 40px 20px; }
+        .container { max-width: 800px; margin: 0 auto; }
+        
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
+        .logo { font-weight: 700; font-size: 18px; }
+        .back-link { color: var(--primary-color); text-decoration: none; font-weight: 500; font-size: 15px; }
+        
+        .result-card { background: var(--card-bg); border-radius: var(--radius-lg); padding: 40px; box-shadow: var(--shadow-soft); text-align: center; margin-bottom: 24px; }
+        .site-name { font-size: 20px; font-weight: 600; color: var(--text-muted); margin-bottom: 20px; }
+        .score-big { font-size: 72px; font-weight: 700; color: #f59e0b; line-height: 1; }
+        .score-max { font-size: 24px; color: var(--text-muted); }
+        .score-text { font-size: 16px; color: var(--text-main); margin-top: 10px; font-weight: 500; }
+        
+        .growth { display: inline-flex; align-items: center; gap: 15px; background: #ecfdf5; padding: 10px 20px; border-radius: 12px; margin: 20px 0; color: #059669; font-weight: 600; font-size: 18px; }
+        
+        .download-btn { display: inline-block; background: #d97706; color: white; text-decoration: none; padding: 16px 32px; border-radius: var(--radius-md); font-weight: 600; font-size: 16px; margin-top: 10px; box-shadow: 0 4px 12px rgba(217, 119, 6, 0.3); transition: 0.2s; }
+        .download-btn:hover { background: #b45309; transform: translateY(-2px); }
+
+        .checks-title { font-size: 20px; font-weight: 600; margin: 40px 0 20px; }
+        .check-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+        .check-item { background: var(--card-bg); padding: 16px 20px; border-radius: var(--radius-md); box-shadow: var(--shadow-soft); display: flex; justify-content: space-between; align-items: center; border-left: 4px solid transparent; }
+        .check-item.pass { border-left-color: #10b981; }
+        .check-item.fail { border-left-color: #ef4444; }
+        .check-name { font-weight: 500; font-size: 15px; }
+        .check-points { font-weight: 600; color: var(--text-muted); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">Agent-Ready Checker</div>
+            <a href="/" class="back-link">← Проверить свой сайт</a>
+        </div>
+
+        <div class="result-card">
+            <div class="site-name">Результат проверки: as-hedging.tilda.ws</div>
+            
+            <div style="display: flex; justify-content: center; align-items: baseline;">
+                <span class="score-big">35</span><span class="score-max">/100</span>
+            </div>
+            <div class="score-text">Базовый доступ. AI видит вас ограниченно.</div>
+            
+            <div class="growth">
+                <span>35</span>
+                <span>➔</span>
+                <span>85</span>
+            </div>
+            
+            <p style="color: #6b7280; font-size: 14px; margin-bottom: 20px;">Скачайте архив с готовыми файлами, чтобы поднять балл</p>
+            
+            <a href="#" class="download-btn">📥 Скачать пакет для AI (ZIP)</a>
+        </div>
+
+        <div class="checks-title">Что проверено (часть списка):</div>
+        <ul class="check-list">
+            <li class="check-item pass">
+                <span class="check-name">✅ sitemap.xml (Карта сайта)</span>
+                <span class="check-points">+5</span>
+            </li>
+            <li class="check-item pass">
+                <span class="check-name">✅ H1 (Главный заголовок)</span>
+                <span class="check-points">+5</span>
+            </li>
+            <li class="check-item pass">
+                <span class="check-name">✅ Meta Description (Описание для AI)</span>
+                <span class="check-points">+5</span>
+            </li>
+            <li class="check-item pass">
+                <span class="check-name">✅ Open Graph (Превью для соцсетей)</span>
+                <span class="check-points">+5</span>
+            </li>
+            <li class="check-item pass">
+                <span class="check-name">✅ Canonical (Защита от дублей)</span>
+                <span class="check-points">+5</span>
+            </li>
+            <li class="check-item fail">
+                <span class="check-name">❌ llms.txt (Карта для LLM)</span>
+                <span class="check-points">+15</span>
+            </li>
+            <li class="check-item fail">
+                <span class="check-name">❌ robots.txt (Правила для ботов)</span>
+                <span class="check-points">+10</span>
+            </li>
+            <li class="check-item fail">
+                <span class="check-name">❌ agent.json (Описание возможностей)</span>
+                <span class="check-points">+10</span>
+            </li>
+            <li class="check-item fail">
+                <span class="check-name">❌ JSON-LD (Структурированные данные)</span>
+                <span class="check-points">+5</span>
+            </li>
+            <li class="check-item fail">
+                <span class="check-name">❌ FAQ Schema (Ответы на вопросы)</span>
+                <span class="check-points">+10</span>
+            </li>
+        </ul>
+    </div>
+</body>
+</html>

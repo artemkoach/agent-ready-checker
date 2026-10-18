@@ -10,11 +10,14 @@ import io
 import zipfile
 from bs4 import BeautifulSoup
 import re
+from dotenv import load_dotenv  # <--- ДЛЯ ЗАГРУЗКИ КЛЮЧА ИЗ .env
+
+load_dotenv()  # <--- ЧИТАЕМ ФАЙЛ .env
 
 app = Flask(__name__)
 
 # --- НАСТРОЙКА DEEPSEEK ---
-DEEPSEEK_KEY = os.environ.get("DEEPSEEK_API_KEY")
+DEEPSEEK_KEY = os.environ.get("DEEPSEEK_API_KEY")  # <--- БЕЗОПАСНЫЙ КЛЮЧ
 client = OpenAI(api_key=DEEPSEEK_KEY, base_url="https://api.deepseek.com")
 
 # --- НАСТРОЙКА СЧЕТЧИКА ---
@@ -306,7 +309,6 @@ Claude и другим нейросетям находить и правильн
 https://github.com/artemkoach/agent-ready-checker
 """
 
-# ⬇️ ВОТ ЭТА СТРОКА БЫЛА УДАЛЕНА У ТЕБЯ ⬇️
 @app.route("/", methods=["GET", "POST"])
 def index():
     result = None
@@ -484,16 +486,13 @@ def download_files():
             if key not in existing_keys:
                 return text
             if ftype == "xml":
-                # XML-комментарий ПОСЛЕ <?xml ?>, иначе файл битый
                 warn = "\n<!-- ВНИМАНИЕ: это у вас уже есть на сайте. Наша версия — для сверки, менять не обязательно. -->\n"
                 if text.startswith("<?xml"):
                     end = text.find("?>") + 2
                     return text[:end] + warn + text[end:].lstrip("\n")
                 return warn + text
             if ftype == "json":
-                # В JSON нельзя текст/комментарии — только переименование
                 return text
-            # txt — обычный текстовый заголовок
             return "=== ВНИМАНИЕ: ЭТО У ВАС УЖЕ ЕСТЬ НА САЙТЕ ===\nНаша версия — для сверки. Менять не обязательно.\n=================================================\n\n" + text
 
         zf.writestr(fn("llms.txt", "llms_txt"), pre("llms_txt", llms_txt_content, "txt"))

@@ -7,7 +7,7 @@
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-6SGJ9KLN8W"></script>
     <script>
@@ -26,7 +26,21 @@
             0%, 100% { text-shadow: 0 0 0 rgba(5, 150, 105, 0); }
             50%      { text-shadow: 0 0 12px rgba(5, 150, 105, 0.35); }
         }
+        @keyframes bg-pulse {
+            0% { background-size: 100% 100%; }
+            50% { background-size: 110% 110%; }
+            100% { background-size: 100% 100%; }
+        }
+
         * { box-sizing: border-box; }
+        
+        /* СТИЛИ ДЛЯ ВЕРХНЕЙ ПОЛОСКИ ПРОГРЕССА */
+        #top-progress-bar {
+            position: fixed; top: 0; left: 0; height: 3px;
+            background: linear-gradient(90deg, #0071e3, #a855f7);
+            width: 0%; z-index: 10000; transition: width 0.4s ease, opacity 0.4s ease;
+            opacity: 0; box-shadow: 0 0 10px rgba(0, 113, 227, 0.6);
+        }
         
         :root {
             --bg-color: #f5f5f7;
@@ -43,13 +57,16 @@
 
         body { 
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; 
-            max-width: 1000px; 
-            margin: 0 auto; 
-            padding: 40px 20px; 
-            background: var(--bg-color); 
-            color: var(--text-main); 
-            line-height: 1.5; 
-            -webkit-font-smoothing: antialiased;
+            max-width: 1000px; margin: 0 auto; padding: 40px 20px; 
+            color: var(--text-main); line-height: 1.5; -webkit-font-smoothing: antialiased;
+            
+            background-color: var(--bg-color);
+            background-image: 
+                radial-gradient(circle at 15% 10%, rgba(0, 113, 227, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at 85% 20%, rgba(168, 85, 247, 0.12) 0%, transparent 45%),
+                radial-gradient(circle at 50% 90%, rgba(6, 182, 212, 0.1) 0%, transparent 50%);
+            background-attachment: fixed; background-size: cover;
+            animation: bg-pulse 15s ease-in-out infinite alternate;
         }
         
         .main-content { max-width: 950px; margin: 0 auto; }
@@ -58,53 +75,59 @@
         p.subtitle { color: var(--text-muted); margin-top: 0; margin-bottom: 30px; font-size: 18px; font-weight: 400; text-align: center; }
         
         form { display: flex; gap: 12px; margin-bottom: 20px; }
-        input[type="text"] { flex: 1; padding: 18px 20px 18px 48px; font-size: 16px; font-family: 'Inter', sans-serif; border: 1px solid rgba(0,0,0,0.1); border-radius: var(--radius-md); outline: none; transition: all 0.3s; background: var(--card-bg); box-shadow: var(--shadow-soft); }
-        input[type="text"]:focus { border-color: var(--primary-color); box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.15); }
+        
+        input[type="text"] { 
+            flex: 1; padding: 18px 20px 18px 48px; font-size: 16px; font-family: 'Inter', sans-serif; 
+            border: 1px solid rgba(0, 0, 0, 0.1); border-radius: var(--radius-md); outline: none; 
+            transition: all 0.3s ease; background: rgba(255, 255, 255, 0.8); 
+            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            box-shadow: var(--shadow-soft); position: relative; z-index: 5;
+        }
+        input[type="text"]:hover { 
+            border-color: rgba(0, 113, 227, 0.4); background: rgba(255, 255, 255, 0.95); 
+            transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08); 
+        }
+        input[type="text"]:focus { 
+            border-color: var(--primary-color); background: #ffffff;
+            transform: translateY(-2px); box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.15), 0 8px 20px rgba(0, 0, 0, 0.08); 
+        }
+        input[type="text"]:focus + #globe-icon, input[type="text"]:hover + #globe-icon {
+            opacity: 1; transform: translateY(-50%) scale(1.1); 
+        }
         
         button { 
-            padding: 18px 0;
-            width: 240px;
-            font-size: 16px; 
-            font-family: 'Inter', sans-serif; 
-            background: var(--primary-color); 
-            color: white; 
-            border: none; 
-            border-radius: var(--radius-md); 
-            cursor: pointer; 
-            font-weight: 600; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            transition: all 0.2s; 
-            box-shadow: var(--shadow-soft); 
+            padding: 18px 0; width: 240px; font-size: 16px; font-family: 'Inter', sans-serif; 
+            background: linear-gradient(135deg, #0071e3 0%, #005bb5 100%); color: white; 
+            border: none; border-radius: var(--radius-md); cursor: pointer; font-weight: 600; 
+            display: flex; align-items: center; justify-content: center; 
+            transition: all 0.2s; box-shadow: var(--shadow-soft); 
         }
-        button:hover:not(:disabled) { 
-            background: var(--primary-hover); 
-            transform: translateY(-2px) scale(1.02);
-            box-shadow: 0 6px 16px rgba(0, 113, 227, 0.3); 
-        }
-        button:active:not(:disabled) { 
-            transform: translateY(1px) scale(0.98);
-            box-shadow: 0 2px 5px rgba(0, 113, 227, 0.2); 
-        }
-        button:disabled { 
-            background: #93c5fd; 
-            cursor: not-allowed; 
-            box-shadow: none; 
-        }
+        button:hover:not(:disabled) { transform: translateY(-2px) scale(1.02); box-shadow: 0 6px 16px rgba(0, 113, 227, 0.3); }
+        button:active:not(:disabled) { transform: translateY(1px) scale(0.98); box-shadow: 0 2px 5px rgba(0, 113, 227, 0.2); }
+        button:disabled { background: #93c5fd; cursor: not-allowed; box-shadow: none; }
 
-        .info-box { background: var(--card-bg); border-radius: var(--radius-lg); padding: 24px 30px; margin-bottom: 30px; font-size: 15px; line-height: 1.6; color: var(--text-main); box-shadow: var(--shadow-soft); border: 1px solid rgba(0,0,0,0.03); text-align: center; }
+        .info-box { 
+            background: rgba(255, 255, 255, 0.6); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); 
+            border: 1px solid rgba(255, 255, 255, 0.8); border-radius: var(--radius-lg); 
+            padding: 24px 30px; margin-bottom: 30px; font-size: 15px; line-height: 1.6; 
+            color: var(--text-main); box-shadow: var(--shadow-soft); text-align: center; 
+        }
         
         .features-section { margin-top: 60px; padding-bottom: 40px; }
         .features-title { font-family: 'Inter', sans-serif; font-size: 15px; font-weight: 400; color: var(--text-muted); line-height: 1.6; max-width: 720px; margin: 0 auto 32px; text-align: center; }
         .features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-        .feature-card { background: var(--card-bg); padding: 30px; border-radius: var(--radius-lg); box-shadow: var(--shadow-soft); transition: transform 0.3s ease, box-shadow 0.3s ease; }
+        
+        .feature-card { 
+            background: rgba(255, 255, 255, 0.6); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); 
+            border: 1px solid rgba(255, 255, 255, 0.8); padding: 30px; border-radius: var(--radius-lg); 
+            box-shadow: var(--shadow-soft); transition: transform 0.3s ease, box-shadow 0.3s ease; 
+        }
         .feature-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-hover); }
         .feature-icon { font-size: 28px; margin-bottom: 12px; }
         .feature-card h3 { font-size: 17px; font-weight: 600; margin-bottom: 16px; margin-top: 0; }
         .feature-list { list-style: none; padding: 0; margin: 0; }
         .feature-list li { font-size: 14px; color: var(--text-muted); margin-bottom: 10px; display: flex; align-items: center; }
-        .feature-list code { background: #f5f5f7; padding: 2px 6px; border-radius: 6px; font-family: monospace; color: var(--text-main); margin-right: 8px; font-size: 13px; }
+        .feature-list code { background: rgba(255,255,255,0.5); padding: 2px 6px; border-radius: 6px; font-family: monospace; color: var(--text-main); margin-right: 8px; font-size: 13px; }
         
         @media (max-width: 768px) {
             h1 { font-size: 32px; }
@@ -121,8 +144,15 @@
         .score-out-of { font-size: 24px; color: #9ca3af; font-weight: 600; font-family: 'Inter', sans-serif; }
         
         .check-list { list-style: none; padding: 0; }
-        .check-item { background: white; padding: 16px 20px; margin-bottom: 8px; border-radius: 8px; display: grid; grid-template-columns: minmax(0,1fr) 160px 90px 210px 55px; align-items: center; gap: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); transition: transform 0.2s, box-shadow 0.2s; border: 1px solid transparent; }
-        .check-item:hover { transform: translateX(4px); box-shadow: 0 4px 12px rgba(0,0,0,0.06); border-color: #e5e7eb; }
+        
+        .check-item { 
+            background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); 
+            border: 1px solid rgba(255, 255, 255, 0.6); padding: 16px 20px; margin-bottom: 8px; 
+            border-radius: 8px; display: grid; grid-template-columns: minmax(0,1fr) 160px 90px 210px 55px; 
+            align-items: center; gap: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); 
+            transition: transform 0.2s, box-shadow 0.2s; 
+        }
+        .check-item:hover { transform: translateX(4px); box-shadow: 0 4px 12px rgba(0,0,0,0.06); }
         .check-name { font-weight: 500; font-size: 15px; }
         .check-points { color: #9ca3af; font-weight: 600; white-space: nowrap; text-align: right; }
         
@@ -137,12 +167,11 @@
 
         .badge-status { padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 700; text-align: center; text-transform: uppercase; letter-spacing: 0.05em; border: 1px solid transparent; }
         .status-ready { background: #d1fae5; color: #065f46; border-color: #a7f3d0; }
-        .status-template { background: #fef3c7; color: #92400e; border-color: #fde68a; }
         .status-dev { background: #f3f4f6; color: #4b5563; border-color: #e5e7eb; }
         .status-have { background: #d1fae5; color: #065f46; border-color: #6ee7b7; }
         .status-need { background: #fef3c7; color: #92400e; border-color: #fde68a; }
 
-        .story-box { background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%); border: 1px solid #fcd34d; padding: 30px; border-radius: 12px; margin-bottom: 25px; box-shadow: 0 10px 25px -5px rgba(251, 191, 36, 0.2); position: relative; overflow: hidden; }
+        .story-box { background: linear-gradient(135deg, rgba(255, 251, 235, 0.8) 0%, rgba(254, 243, 199, 0.8) 100%); backdrop-filter: blur(10px); border: 1px solid #fcd34d; padding: 30px; border-radius: 12px; margin-bottom: 25px; box-shadow: 0 10px 25px -5px rgba(251, 191, 36, 0.2); position: relative; overflow: hidden; }
         .story-title { font-weight: 700; color: #92400e; font-size: 20px; margin-top: 0; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; }
         .story-text { color: #78350f; font-size: 15px; line-height: 1.6; margin-bottom: 20px; }
         
@@ -157,60 +186,100 @@
         .download-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 16px 32px; background: #d97706; color: white; text-decoration: none; font-size: 16px; font-weight: 600; border-radius: 8px; box-shadow: 0 4px 6px rgba(217, 119, 6, 0.3); transition: all 0.2s; border: none; width: auto; }
         .download-btn:hover { background: #b45309; transform: translateY(-2px); box-shadow: 0 6px 12px rgba(217, 119, 6, 0.4); }
 
-        .success-box { background: #ecfdf5; border: 1px solid #6ee7b7; padding: 30px; border-radius: 12px; margin-bottom: 25px; text-align: center; box-shadow: 0 4px 6px rgba(16, 185, 129, 0.1); }
+        .success-box { background: rgba(236, 253, 245, 0.8); backdrop-filter: blur(10px); border: 1px solid #6ee7b7; padding: 30px; border-radius: 12px; margin-bottom: 25px; text-align: center; box-shadow: 0 4px 6px rgba(16, 185, 129, 0.1); }
         .success-title { color: #065f46; font-size: 20px; font-weight: 700; margin-top: 0; margin-bottom: 10px; }
         .success-text { color: #047857; font-size: 15px; line-height: 1.5; }
 
-        .loading-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(249, 250, 251, 0.95); backdrop-filter: blur(8px); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; opacity: 0; transition: opacity 0.3s ease; }
-        .loading-overlay.active { display: flex; opacity: 1; }
-        .ai-spinner { width: 60px; height: 60px; border: 5px solid #e5e7eb; border-top-color: #2563eb; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 25px; }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        .loading-title { font-size: 24px; font-weight: 700; color: #111827; margin-bottom: 10px; }
-        .loading-dynamic { font-size: 16px; color: #4b5563; font-weight: 500; height: 24px; margin-bottom: 20px; }
-        .loading-note { font-size: 13px; color: #9ca3af; max-width: 300px; text-align: center; line-height: 1.4; }
+        /* --- НОВЫЙ ЛОАДЕР МАТРИЦА + ТЕРМИНАЛ --- */
+        .matrix-loading-overlay { 
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; 
+            background: #020205; display: none; flex-direction: column; align-items: center; justify-content: center; 
+            z-index: 9999; opacity: 0; transition: opacity 0.4s ease; 
+        }
+        .matrix-loading-overlay.active { display: flex; opacity: 1; }
+        
+        #canvas-algo { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; opacity: 0.6; }
+        
+        .matrix-glass-panel {
+            position: relative; z-index: 2; width: 600px; max-width: 90%;
+            background: rgba(10, 12, 18, 0.75); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(0, 210, 255, 0.2); border-radius: 24px; padding: 40px;
+            text-align: center; box-shadow: 0 30px 60px rgba(0, 0, 0, 0.8), 0 0 40px rgba(0, 210, 255, 0.1);
+        }
+        
+        .matrix-title { font-size: 24px; font-weight: 700; margin-bottom: 8px; color: #ffffff; text-shadow: 0 0 20px rgba(0, 210, 255, 0.5); }
+        .matrix-subtitle { font-size: 15px; color: #00d2ff; margin-bottom: 25px; font-weight: 500; }
+        
+        .matrix-terminal-box {
+            background: rgba(0, 0, 0, 0.9); border: 1px solid rgba(0, 255, 204, 0.3); border-radius: 12px;
+            padding: 20px; text-align: left; font-family: 'JetBrains Mono', monospace; font-size: 13px;
+            color: #00ffcc; text-shadow: 0 0 8px rgba(0, 255, 204, 0.5); margin-bottom: 25px;
+            box-shadow: inset 0 0 20px rgba(0, 255, 204, 0.05); height: 150px; overflow: hidden;
+        }
+        
+        .term-line { margin-bottom: 8px; opacity: 0; transform: translateY(5px); transition: all 0.3s ease; display: flex; align-items: flex-start; gap: 8px;}
+        .term-line.visible { opacity: 1; transform: translateY(0); }
+        .term-line .check { color: #10b981; }
+        .term-line .cross { color: #ef4444; }
+        .term-line .wait { color: #f59e0b; animation: pulse 1s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        
+        .matrix-cursor { display: inline-block; width: 8px; height: 14px; background: #00ffcc; animation: blink 1s step-end infinite; vertical-align: middle; margin-left: 4px; }
+        @keyframes blink { 50% { opacity: 0; } }
+        
+        .matrix-progress-bg { width: 100%; height: 4px; background: rgba(255, 255, 255, 0.1); border-radius: 2px; overflow: hidden; }
+        .matrix-progress-fill { width: 0%; height: 100%; background: linear-gradient(90deg, #00d2ff, #a855f7); transition: width 0.3s ease; box-shadow: 0 0 15px #00d2ff; }
 
+        /* СТЕКЛЯННАЯ КНОПКА ПРИМЕРА */
         .btn-premium {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 240px;
-            padding: 12px 0;
-            white-space: nowrap;
-            background: white;
-            color: var(--text-main);
-            text-decoration: none;
-            font-size: 16px;
-            font-weight: 600;
-            border-radius: var(--radius-md);
-            border: 1.5px solid rgba(0, 113, 227, 0.3);
-            transition: all 0.2s; 
-            box-shadow: var(--shadow-soft); 
-            cursor: pointer;
+            display: inline-flex; align-items: center; justify-content: center; width: 240px; padding: 12px 0; white-space: nowrap;
+            background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            color: var(--text-main); text-decoration: none; font-size: 16px; font-weight: 600; border-radius: var(--radius-md);
+            border: 1.5px solid rgba(0, 113, 227, 0.3); transition: all 0.2s; box-shadow: var(--shadow-soft); cursor: pointer;
         }
-        .btn-premium:hover {
-            background: #f0f7ff;
-            border-color: var(--primary-color);
-            color: var(--primary-color);
-            transform: translateY(-2px) scale(1.02);
-            box-shadow: 0 6px 16px rgba(0, 113, 227, 0.15);
-        }
-        .btn-premium:active {
-            transform: translateY(1px) scale(0.98);
-            box-shadow: 0 2px 5px rgba(0, 113, 227, 0.1);
-        }
+        .btn-premium:hover { background: rgba(240, 247, 255, 0.9); border-color: var(--primary-color); color: var(--primary-color); transform: translateY(-2px) scale(1.02); box-shadow: 0 6px 16px rgba(0, 113, 227, 0.15); }
+        .btn-premium:active { transform: translateY(1px) scale(0.98); box-shadow: 0 2px 5px rgba(0, 113, 227, 0.1); }
     </style>
 </head>
 <body>
-    <div style="position: fixed; top: 20px; right: 20px; z-index: 1000; font-size: 14px; color: var(--text-muted); display: flex; align-items: center; gap: 8px; background: white; padding: 8px 16px; border-radius: 20px; box-shadow: var(--shadow-soft);">
+    <!-- ПОЛОСКА ПРОГРЕССА -->
+    <div id="top-progress-bar"></div>
+
+    <div style="position: fixed; top: 20px; right: 20px; z-index: 1000; font-size: 14px; color: var(--text-muted); display: flex; align-items: center; gap: 8px; background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(10px); padding: 8px 16px; border-radius: 20px; box-shadow: var(--shadow-soft); border: 1px solid rgba(255,255,255,0.5);">
         <span style="width: 8px; height: 8px; background-color: #34c759; border-radius: 50%; display: inline-block;"></span>
         Уже проверено <b>{{ total_checks }}</b> сайтов
     </div>
 
-    <div id="loading-overlay" class="loading-overlay">
-        <div class="ai-spinner"></div>
-        <div class="loading-title">🤖 Нейросеть работает</div>
-        <div class="loading-dynamic" id="dynamic-loading-text">Читаем ваш сайт...</div>
-        <div class="loading-note">ИИ анализирует контент и генерирует файлы. Пожалуйста, подождите 5–10 секунд.</div>
+    <!-- НОВЫЙ ЛОАДЕР (Матрица + Терминал) -->
+    <div id="loading-overlay" class="matrix-loading-overlay">
+        <canvas id="canvas-algo"></canvas>
+        <div class="matrix-glass-panel">
+            <div class="matrix-title" id="ui-title">Анализируем ваш сайт</div>
+            <div class="matrix-subtitle" id="ui-subtitle">Сканируем структуру и ищем AI-файлы...</div>
+            
+            <div class="matrix-terminal-box">
+                <!-- Реальные шаги для ПРОВЕРКИ -->
+                <div class="term-group" id="term-check" style="display: block;">
+                    <div class="term-line" id="c1"><span class="wait">></span> Скачиваем главную страницу...</div>
+                    <div class="term-line" id="c2"><span class="check">✓</span> Проверяем robots.txt и llms.txt...</div>
+                    <div class="term-line" id="c3"><span class="cross">✗</span> llms.txt не найден. Анализируем HTML...</div>
+                    <div class="term-line" id="c4"><span class="check">✓</span> Ищем H1, Meta, Open Graph, JSON-LD...</div>
+                    <div class="term-line" id="c5"><span class="wait">></span> Подсчет баллов и статуса CMS... <span class="matrix-cursor"></span></div>
+                </div>
+                <!-- Реальные шаги для ЗАГРУЗКИ -->
+                <div class="term-group" id="term-download" style="display: none;">
+                    <div class="term-line" id="d1"><span class="wait">></span> Извлекаем внутренние ссылки для sitemap...</div>
+                    <div class="term-line" id="d2"><span class="wait">></span> Отправляем запрос в DeepSeek AI...</div>
+                    <div class="term-line" id="d3"><span class="check">✓</span> Генерируем agent.json и llms.txt...</div>
+                    <div class="term-line" id="d4"><span class="check">✓</span> Генерируем JSON-LD и FAQ Schema...</div>
+                    <div class="term-line" id="d5"><span class="wait">></span> Упаковываем файлы в ZIP-архив... <span class="matrix-cursor"></span></div>
+                </div>
+            </div>
+            
+            <div class="matrix-progress-bg">
+                <div class="matrix-progress-fill" id="matrix-progress-fill"></div>
+            </div>
+        </div>
     </div>
 
     <div class="main-content">
@@ -220,8 +289,10 @@
         </div>
 
         <form method="POST" id="checker-form" onsubmit="showLoading()" class="anim-fade delay-2" style="position: relative;">
-            <div style="position: absolute; left: 18px; top: 50%; transform: translateY(-50%); font-size: 18px; opacity: 0.5; pointer-events: none;">🌐</div>
+            <div id="globe-icon" style="position: absolute; left: 18px; top: 50%; transform: translateY(-50%); font-size: 18px; opacity: 0.6; pointer-events: none; z-index: 10; transition: all 0.3s;">🌐</div>
+            
             <input type="text" name="url" placeholder="Введите адрес сайта" value="{{ request.form.url or '' }}" required>
+            
             <button type="submit" id="submit-btn">
                 <span id="btn-text">Проверить бесплатно</span>
             </button>
@@ -306,9 +377,7 @@
                 {% for item in result.results %}
                     <li class="check-item {{ 'pass' if item.exists else 'fail' }}" style="animation: fadeInUp 0.4s ease-out forwards; opacity: 0; animation-delay: {{ loop.index0 * 0.08 }}s;">
                         <span class="check-name">{{ '✅' if item.exists else '❌' }} {{ item.label }}</span>
-
                         <span class="badge-status {{ 'status-have' if item.exists else 'status-need' }}">{{ 'УЖЕ НАСТРОЕНО' if item.exists else 'МОЖЕМ УЛУЧШИТЬ' }}</span>
-
                         {% if item.category == 'GEO' %}
                             <span class="badge badge-geo">GEO</span>
                         {% elif item.category == 'Агенты' %}
@@ -318,23 +387,17 @@
                         {% else %}
                             <span></span>
                         {% endif %}
-
-                        {% if not item.exists %}
-                            {% if item.key in ['llms_txt', 'agent_json', 'ai_plugin', 'robots_ai', 'sitemap', 'llms_full', 'jsonld', 'meta_desc', 'open_graph', 'canonical', 'faq_schema'] %}
-                                <span class="badge-status status-ready">ФАЙЛ ГОТОВ</span>
-                            {% else %}
-                                <span class="badge-status status-dev">В РАЗРАБОТКЕ</span>
-                            {% endif %}
+                        {% if item.key in ['llms_txt', 'agent_json', 'ai_plugin', 'robots_ai', 'sitemap', 'llms_full', 'jsonld', 'meta_desc', 'open_graph', 'canonical', 'faq_schema'] %}
+                            <span class="badge-status status-ready">ФАЙЛ ГОТОВ</span>
                         {% else %}
-                            <span></span>
+                            <span class="badge-status status-dev">В РАЗРАБОТКЕ</span>
                         {% endif %}
-
                         <span class="check-points">+{{ item.weight }}</span>
                     </li>
-                {% endfor %}
+                {% endfor %} 
             </ul>
 
-            <div class="anim-fade" style="animation-delay: {{ result.results|length * 0.08 }}s; margin-top: 40px; padding: 20px; background: white; border-radius: 12px; font-size: 14px; color: #4b5563; box-shadow: 0 2px 10px rgba(0,0,0,0.03);">
+            <div class="anim-fade" style="animation-delay: {{ result.results|length * 0.08 }}s; margin-top: 40px; padding: 20px; background: rgba(255, 255, 255, 0.6); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-radius: 12px; font-size: 14px; color: #4b5563; box-shadow: 0 2px 10px rgba(0,0,0,0.03); border: 1px solid rgba(255,255,255,0.5);">
                 <p style="margin-top: 0; font-weight: 700; color: #111827; font-size: 16px;">Что это значит?</p>
                 <p style="margin-bottom: 10px;"><span style="color: #0369a1; font-weight: 700;">GEO (Generative Engine Optimization)</span> — проверки, которые помогают ChatGPT, Perplexity и Google AI Overviews найти ваш сайт и цитировать его в ответах.</p>
                 <p style="margin-bottom: 0;"><span style="color: #7e22ce; font-weight: 700;">Агенты</span> — технические файлы, которые позволяют AI-агентам не просто читать сайт, но и совершать на нем действия (например, заказывать товары или вызывать API).</p>
@@ -355,7 +418,6 @@
                     <li><code>sitemap.xml</code> — структура сайта</li>
                 </ul>
             </div>
-
             <div class="feature-card">
                 <div class="feature-icon">⚙️</div>
                 <h3>Агенты (Действия)</h3>
@@ -365,7 +427,6 @@
                     <li><code>openapi.json</code> — API сервиса</li>
                 </ul>
             </div>
-
             <div class="feature-card">
                 <div class="feature-icon">📝</div>
                 <h3>Контент (Семантика)</h3>
@@ -379,7 +440,7 @@
     </section>
 
     <div style="position: fixed; bottom: 20px; right: 20px; z-index: 1000;">
-        <a href="https://github.com/artemkoach/agent-ready-checker" target="_blank" style="display: inline-flex; align-items: center; gap: 8px; color: #6b7280; text-decoration: none; font-size: 14px; font-weight: 500; padding: 10px 20px; border-radius: 8px; background: white; box-shadow: 0 4px 12px rgba(0,0,0,0.1); transition: all 0.2s; border: 1px solid #e5e7eb;" onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 8px 20px rgba(0,0,0,0.15)'; this.style.color='#111827';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.1)'; this.style.color='#6b7280';">
+        <a href="https://github.com/artemkoach/agent-ready-checker" target="_blank" style="display: inline-flex; align-items: center; gap: 8px; color: #6b7280; text-decoration: none; font-size: 14px; font-weight: 500; padding: 10px 20px; border-radius: 8px; background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); transition: all 0.2s; border: 1px solid rgba(255,255,255,0.5);" onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 8px 20px rgba(0,0,0,0.15)'; this.style.color='#111827';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.1)'; this.style.color='#6b7280';">
             <svg height="20" width="20" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path></svg>
             Смотреть исходный код на GitHub
         </a>
@@ -387,7 +448,6 @@
 
     <div style="position: fixed; bottom: 20px; left: 20px; display: flex; flex-direction: column; z-index: 1000; pointer-events: none;">
         <span style="font-size: 10px; color: #9ca3af; margin-bottom: 5px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em;">При поддержке</span>
-        
         <div style="display: flex; align-items: flex-start;">
             <span style="color: #9e2a2b; font-size: 28px; font-weight: 700; font-family: 'Playfair Display', serif; line-height: 1; letter-spacing: -1px;">AS</span>
             <span style="color: #111827; font-size: 28px; font-weight: 400; font-family: 'Inter', sans-serif; line-height: 1; letter-spacing: -0.5px; margin-left: 2px;">Hedging</span>
@@ -397,42 +457,129 @@
     </div>
 
     <script>
-        let loadingInterval;
+        // ==========================================
+        // 1. МАТРИЦА (ФОН)
+        // ==========================================
+        const canvas = document.getElementById('canvas-algo');
+        const ctx = canvas.getContext('2d');
+        let matrixInterval = null;
+        
+        function initMatrix() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            
+            const alphabet = "01{}[]()<>=+-*/&|!ΣπλΔ∞<>LLM_GEO_MCP".split("");
+            const fontSize = 16;
+            const columns = canvas.width / fontSize;
+            const drops = [];
+            for (let x = 0; x < columns; x++) drops[x] = 1;
+
+            if (matrixInterval) clearInterval(matrixInterval);
+
+            matrixInterval = setInterval(() => {
+                ctx.fillStyle = "rgba(2, 2, 5, 0.08)";
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.font = fontSize + "px 'JetBrains Mono', monospace";
+                
+                for (let i = 0; i < drops.length; i++) {
+                    const text = alphabet[Math.floor(Math.random() * alphabet.length)];
+                    const isWhite = Math.random() > 0.9;
+                    ctx.fillStyle = isWhite ? "#ffffff" : "rgba(0, 210, 255, 0.8)";
+                    ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+                    
+                    if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
+                    drops[i]++;
+                }
+            }, 33);
+        }
+
+        window.addEventListener('resize', () => {
+            if (document.getElementById('loading-overlay').classList.contains('active')) {
+                initMatrix();
+            }
+        });
+
+        // ==========================================
+        // 2. АНИМАЦИЯ ТЕРМИНАЛА
+        // ==========================================
+        const matrixProgressFill = document.getElementById('matrix-progress-fill');
+        const checkLines = [document.getElementById('c1'), document.getElementById('c2'), document.getElementById('c3'), document.getElementById('c4'), document.getElementById('c5')];
+        const downloadLines = [document.getElementById('d1'), document.getElementById('d2'), document.getElementById('d3'), document.getElementById('d4'), document.getElementById('d5')];
+        let lineTimeouts = [];
+
+        function animateLines(lines) {
+            // Очищаем старые таймауты, если они были
+            lineTimeouts.forEach(clearTimeout);
+            lineTimeouts = [];
+            
+            lines.forEach(l => l.classList.remove('visible'));
+            matrixProgressFill.style.width = '0%';
+
+            lineTimeouts.push(setTimeout(() => { lines[0].classList.add('visible'); matrixProgressFill.style.width = '15%'; }, 300));
+            lineTimeouts.push(setTimeout(() => { lines[1].classList.add('visible'); matrixProgressFill.style.width = '35%'; }, 1100));
+            lineTimeouts.push(setTimeout(() => { lines[2].classList.add('visible'); matrixProgressFill.style.width = '55%'; }, 1900));
+            lineTimeouts.push(setTimeout(() => { lines[3].classList.add('visible'); matrixProgressFill.style.width = '75%'; }, 2700));
+            lineTimeouts.push(setTimeout(() => { lines[4].classList.add('visible'); matrixProgressFill.style.width = '95%'; }, 3500));
+        }
+
+        // ==========================================
+        // 3. УПРАВЛЕНИЕ ЛОАДЕРОМ
+        // ==========================================
+        function startTopProgressBar() {
+            const bar = document.getElementById('top-progress-bar');
+            bar.style.opacity = '1';
+            bar.style.width = '15%';
+            setTimeout(() => { bar.style.width = '40%'; }, 300);
+            setTimeout(() => { bar.style.width = '65%'; }, 1000);
+            setTimeout(() => { bar.style.width = '85%'; }, 2000);
+            setTimeout(() => { bar.style.width = '95%'; }, 3500);
+        }
 
         function showLoading() {
+            // Отключаем кнопку и запускаем верхнюю полоску
+            document.getElementById('submit-btn').disabled = true;
+            startTopProgressBar();
+
+            // Запускаем матрицу и лоадер проверки
             const overlay = document.getElementById('loading-overlay');
             overlay.classList.add('active');
-            document.getElementById('submit-btn').disabled = true;
+            initMatrix();
 
-            const texts = [
-                "Читаем структуру сайта...",
-                "ИИ анализирует контент...",
-                "Генерируем agent.json...",
-                "Формируем умный llms.txt...",
-                "Упаковываем архив...",
-                "Почти готово..."
-            ];
-            let i = 0;
-            const dynamicText = document.getElementById('dynamic-loading-text');
-            dynamicText.textContent = texts[0];
+            document.getElementById('ui-title').innerText = "Анализируем ваш сайт";
+            document.getElementById('ui-subtitle').innerText = "Сканируем структуру и ищем AI-файлы...";
+            document.getElementById('term-check').style.display = 'block';
+            document.getElementById('term-download').style.display = 'none';
             
-            loadingInterval = setInterval(() => {
-                i++;
-                if (i < texts.length) {
-                    dynamicText.textContent = texts[i];
-                }
-            }, 2000);
+            animateLines(checkLines);
         }
 
         function showDownloadLoading() {
+            // Запускаем верхнюю полоску
+            startTopProgressBar();
+
+            // Запускаем матрицу и лоадер скачивания
             const overlay = document.getElementById('loading-overlay');
-            document.querySelector('.loading-title').textContent = "📦 Создаем архив...";
-            document.getElementById('dynamic-loading-text').textContent = "ИИ генерирует файлы для вашего сайта...";
             overlay.classList.add('active');
+            initMatrix();
+
+            document.getElementById('ui-title').innerText = "Формируем ZIP-архив";
+            document.getElementById('ui-subtitle').innerText = "Нейросеть генерирует файлы...";
+            document.getElementById('term-check').style.display = 'none';
+            document.getElementById('term-download').style.display = 'block';
             
+            animateLines(downloadLines);
+
+            // Через 4.5 секунды скрываем лоадер и завершаем верхнюю полоску
             setTimeout(() => {
-                overlay.classList.remove('active');
-            }, 5000);
+                const bar = document.getElementById('top-progress-bar');
+                bar.style.width = '100%';
+                
+                setTimeout(() => {
+                    overlay.classList.remove('active'); // Скрываем матрицу
+                    bar.style.opacity = '0';
+                    setTimeout(() => { bar.style.width = '0%'; }, 400);
+                }, 500);
+            }, 4500);
         }
     </script>
 </body>

@@ -44,9 +44,9 @@
             -webkit-font-smoothing: antialiased;
         }
         
-        .main-content { max-width: 750px; margin: 0 auto; }
+        .main-content { max-width: 950px; margin: 0 auto; }
 
-        h1 { margin-bottom: 15px; font-weight: 700; letter-spacing: -1px; font-size: 42px; line-height: 1.1; text-align: center; }
+        h1 { margin-bottom: 15px; font-weight: 700; letter-spacing: -1px; font-size: 38px; line-height: 1.1; text-align: center; }
         p.subtitle { color: var(--text-muted); margin-top: 0; margin-bottom: 30px; font-size: 18px; font-weight: 400; text-align: center; }
         
         form { display: flex; gap: 12px; margin-bottom: 20px; }
@@ -140,12 +140,12 @@
     <div class="main-content">
         <div class="anim-fade">
             <h1>Проверка готовности сайта к AI-поисковикам</h1>
-            <p class="subtitle">Узнайте, находят ли вас ChatGPT, Claude и Perplexity и другие ИИ. Получите оценку от 0 до 100 и готовые файлы для исправления.</p>
+            <p class="subtitle">Узнайте, находят ли вас ChatGPT, Claude и Perplexity и другие ИИ. Получите оценку от 0 до 100 и готовые файлы для улучшения поиска.</p>
         </div>
 
         <form method="POST" id="checker-form" onsubmit="showLoading()" class="anim-fade delay-2" style="position: relative;">
             <div style="position: absolute; left: 18px; top: 50%; transform: translateY(-50%); font-size: 18px; opacity: 0.5; pointer-events: none;">🌐</div>
-            <input type="text" name="url" placeholder="Введите адрес сайта (например, amvera.ru)" value="{{ request.form.url or '' }}" required>
+            <input type="text" name="url" placeholder="Введите адрес сайта" value="{{ request.form.url or '' }}" required>
             <button type="submit" id="submit-btn">
                 <span id="btn-text">Проверить бесплатно</span>
             </button>
@@ -157,10 +157,6 @@
                 Уже проверено <b>{{ total_checks }}</b> сайтов
             </div>
             <a href="/demo" style="color: var(--primary-color); text-decoration: none; font-size: 15px; font-weight: 500;">Посмотреть пример отчёта (as-hedging.tilda.ws) →</a>
-        </div>
-
-        <div class="info-box anim-fade delay-1">
-            <strong style="color: var(--text-main);">Зачем это нужно?</strong> Нейросети (ChatGPT, Claude, Perplexity) уже ищут информацию в интернете. Чтобы они находили и цитировали ваш сайт, он должен быть к этому готов технически.
         </div>
 
     {% if error %}

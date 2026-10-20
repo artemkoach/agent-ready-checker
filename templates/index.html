@@ -7,7 +7,7 @@
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-6SGJ9KLN8W"></script>
     <script>
@@ -30,6 +30,20 @@
             0% { background-size: 100% 100%; }
             50% { background-size: 110% 110%; }
             100% { background-size: 100% 100%; }
+        }
+
+        /* АНИМАЦИИ ДЛЯ НОВОГО ЛОГОТИПА */
+        @keyframes pulseCore {
+            0% { transform: scale(0.9); box-shadow: 0 0 15px rgba(0, 113, 227, 0.4); }
+            100% { transform: scale(1.1); box-shadow: 0 0 30px rgba(168, 85, 247, 0.8); }
+        }
+        @keyframes spinRing {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        @keyframes shineText {
+            0% { background-position: 0% center; }
+            100% { background-position: -200% center; }
         }
 
         * { box-sizing: border-box; }
@@ -71,10 +85,7 @@
         
         .main-content { max-width: 950px; margin: 0 auto; }
 
-        h1 { margin-bottom: 15px; font-weight: 700; letter-spacing: -1px; font-size: 38px; line-height: 1.1; text-align: center; }
-        p.subtitle { color: var(--text-muted); margin-top: 0; margin-bottom: 30px; font-size: 18px; font-weight: 400; text-align: center; }
-        
-        form { display: flex; gap: 12px; margin-bottom: 20px; }
+        form { display: flex; gap: 12px; margin-bottom: 20px; margin-top: 20px; }
         
         input[type="text"] { 
             flex: 1; padding: 18px 20px 18px 48px; font-size: 16px; font-family: 'Inter', sans-serif; 
@@ -113,8 +124,12 @@
             color: var(--text-main); box-shadow: var(--shadow-soft); text-align: center; 
         }
         
-        .features-section { margin-top: 60px; padding-bottom: 40px; }
-        .features-title { font-family: 'Inter', sans-serif; font-size: 15px; font-weight: 400; color: var(--text-muted); line-height: 1.6; max-width: 720px; margin: 0 auto 32px; text-align: center; }
+        /* Увеличен отступ перед секцией фичей */
+        .features-section { margin-top: 100px; padding-bottom: 40px; }
+        
+        /* Увеличен отступ под текстом "Ниже — 16 параметров..." */
+        .features-title { font-family: 'Inter', sans-serif; font-size: 15px; font-weight: 400; color: var(--text-muted); line-height: 1.6; max-width: 720px; margin: 0 auto 50px; text-align: center; }
+        
         .features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
         
         .feature-card { 
@@ -129,13 +144,16 @@
         .feature-list code { background: rgba(255,255,255,0.5); padding: 2px 6px; border-radius: 6px; font-family: monospace; color: var(--text-main); margin-right: 8px; font-size: 13px; }
         
         @media (max-width: 768px) {
-            h1 { font-size: 32px; }
+            .hero-logo-container { flex-direction: column; gap: 8px; }
+            .logo-text { font-size: 32px; text-align: center; }
             form { flex-direction: column; }
             button { width: 100%; }
             .btn-premium { width: 100%; }
             .features-grid { grid-template-columns: 1fr; }
             .check-item { grid-template-columns: 1fr; gap: 4px; }
             .check-points { text-align: left; }
+            .form-bottom-row { flex-direction: column; align-items: center; gap: 15px; }
+            .text-under-form { text-align: center; }
         }
 
         .score-box { background: white; padding: 30px 20px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.04); margin-bottom: 25px; text-align: center; border: 1px solid #f3f4f6; }
@@ -189,7 +207,7 @@
         .success-title { color: #065f46; font-size: 20px; font-weight: 700; margin-top: 0; margin-bottom: 10px; }
         .success-text { color: #047857; font-size: 15px; line-height: 1.5; }
 
-        /* --- НОВЫЙ СВЕТЛЫЙ ЛОАДЕР --- */
+        /* --- СВЕТЛЫЙ ЛОАДЕР --- */
         .matrix-loading-overlay { 
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; 
             background: rgba(245, 245, 247, 0.6); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
@@ -240,6 +258,83 @@
         }
         .btn-premium:hover { background: rgba(240, 247, 255, 0.9); border-color: var(--primary-color); color: var(--primary-color); transform: translateY(-2px) scale(1.02); box-shadow: 0 6px 16px rgba(0, 113, 227, 0.15); }
         .btn-premium:active { transform: translateY(1px) scale(0.98); box-shadow: 0 2px 5px rgba(0, 113, 227, 0.1); }
+
+        /* --- ЛОГОТИП --- */
+        .hero-logo-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            margin-bottom: 10px;
+        }
+        .orb-container {
+            position: relative;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .orb-core {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #0071e3, #a855f7);
+            box-shadow: inset 0 0 10px rgba(255,255,255,0.5), 0 0 20px rgba(0, 113, 227, 0.6);
+            animation: pulseCore 2s ease-in-out infinite alternate;
+        }
+        .orb-ring {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 2px solid transparent;
+            border-top-color: #0071e3;
+            border-bottom-color: #a855f7;
+            animation: spinRing 3s linear infinite;
+        }
+        .logo-text {
+            font-size: 38px;
+            font-weight: 800;
+            letter-spacing: -1px;
+            line-height: 1.1;
+            background: linear-gradient(90deg, #1d1d1f 0%, #1d1d1f 40%, #0071e3 50%, #a855f7 60%, #1d1d1f 100%);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: shineText 4s linear infinite;
+            margin: 0;
+        }
+
+        /* Увеличен отступ под подзаголовком */
+        h2.main-subtitle {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--text-main);
+            text-align: center;
+            margin-top: 0;
+            margin-bottom: 60px;
+            letter-spacing: -0.5px;
+        }
+
+        .form-bottom-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 20px;
+            margin-bottom: 80px;
+        }
+        
+        .text-under-form {
+            color: var(--text-muted); 
+            margin: 0; 
+            font-size: 16px; 
+            font-weight: 400; 
+            text-align: left;
+            line-height: 1.5;
+            max-width: 580px;
+        }
     </style>
 </head>
 <body>
@@ -259,7 +354,6 @@
             <div class="matrix-subtitle" id="ui-subtitle">Сканируем структуру и ищем AI-файлы...</div>
             
             <div class="matrix-terminal-box">
-                <!-- Реальные шаги для ПРОВЕРКИ -->
                 <div class="term-group" id="term-check" style="display: block;">
                     <div class="term-line" id="c1"><span class="wait">></span> Скачиваем главную страницу...</div>
                     <div class="term-line" id="c2"><span class="check">✓</span> Проверяем robots.txt и llms.txt...</div>
@@ -267,7 +361,6 @@
                     <div class="term-line" id="c4"><span class="check">✓</span> Ищем H1, Meta, Open Graph, JSON-LD...</div>
                     <div class="term-line" id="c5"><span class="wait">></span> Подсчет баллов и статуса CMS... <span class="matrix-cursor"></span></div>
                 </div>
-                <!-- Реальные шаги для ЗАГРУЗКИ -->
                 <div class="term-group" id="term-download" style="display: none;">
                     <div class="term-line" id="d1"><span class="wait">></span> Извлекаем внутренние ссылки для sitemap...</div>
                     <div class="term-line" id="d2"><span class="wait">></span> Отправляем запрос в DeepSeek AI...</div>
@@ -284,22 +377,30 @@
     </div>
 
     <div class="main-content">
+        <!-- ЛОГОТИП + ПОДЗАГОЛОВОК -->
         <div class="anim-fade">
-            <h1>Проверка готовности сайта к AI-поисковикам</h1>
-            <p class="subtitle">Узнайте, находят ли вас ChatGPT, Claude и Perplexity и другие ИИ. Получите оценку от 0 до 100 и готовые файлы для улучшения поиска.</p>
+            <div class="hero-logo-container">
+                <div class="orb-container">
+                    <div class="orb-ring"></div>
+                    <div class="orb-core"></div>
+                </div>
+                <h1 class="logo-text">Agent-Ready Checker</h1>
+            </div>
+            <h2 class="main-subtitle">Проверка готовности сайта к AI-поисковикам</h2>
         </div>
 
+        <!-- ФОРМА ПОИСКА -->
         <form method="POST" id="checker-form" onsubmit="showLoading()" class="anim-fade delay-2" style="position: relative;">
             <div id="globe-icon" style="position: absolute; left: 18px; top: 50%; transform: translateY(-50%); font-size: 18px; opacity: 0.6; pointer-events: none; z-index: 10; transition: all 0.3s;">🌐</div>
-            
             <input type="text" name="url" placeholder="Введите адрес сайта" value="{{ request.form.url or '' }}" required>
-            
             <button type="submit" id="submit-btn">
                 <span id="btn-text">Проверить бесплатно</span>
             </button>
         </form>
 
-        <div style="display: flex; justify-content: flex-end; margin-top: 10px; margin-bottom: 30px;">
+        <!-- НОВЫЙ БЛОК: Текст слева, кнопка справа -->
+        <div class="form-bottom-row anim-fade delay-2">
+            <p class="text-under-form">Узнайте, находят ли вас ChatGPT, Claude и Perplexity и другие ИИ. Получите оценку от 0 до 100 и готовые файлы для улучшения поиска.</p>
             <a href="/demo" class="btn-premium">Посмотреть пример отчёта</a>
         </div>
 
@@ -419,7 +520,7 @@
                 </ul>
             </div>
             <div class="feature-card">
-                <h3>Агенты (Действия)</h3>
+                <h3>Agents (Действия)</h3>
                 <ul class="feature-list">
                     <li><code>agent.json</code> — возможности</li>
                     <li><code>mcp.json</code> — протокол агентов</li>
@@ -427,7 +528,7 @@
                 </ul>
             </div>
             <div class="feature-card">
-                <h3>Контент (Семантика)</h3>
+                <h3>Content (Семантика)</h3>
                 <ul class="feature-list">
                     <li><code>JSON-LD</code> — разметка данных</li>
                     <li><code>FAQ Schema</code> — ответы на вопросы</li>

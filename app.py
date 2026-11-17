@@ -23,9 +23,11 @@ DEEPSEEK_KEY = os.environ.get("DEEPSEEK_API_KEY")
 if DEEPSEEK_KEY:
     print("✅ КЛЮЧ УСПЕШНО ЗАГРУЖЕН ИЗ .env")
 else:
-    print("❌ ОШИБКА: КЛЮЧ НЕ НАЙДЕН. ПРОВЕРЬ ФАЙЛ .env ИЛИ ПЕРЕМЕННЫЕ RENDER")
+    print("❌ ОШИБКА: КЛЮЧ НЕ НАЙДЕН. ДОБАВЬТЕ DEEPSEEK_API_KEY В ПЕРЕМЕННЫЕ ОКРУЖЕНИЯ (AMVERA)")
 
-client = OpenAI(api_key=DEEPSEEK_KEY, base_url="https://api.deepseek.com")
+# Создаём клиент только при наличии ключа, чтобы приложение не падало
+# на старте, если переменная окружения ещё не задана на хостинге.
+client = OpenAI(api_key=DEEPSEEK_KEY, base_url="https://api.deepseek.com") if DEEPSEEK_KEY else None
 
 # --- НАСТРОЙКА СЧЕТЧИКА ---
 COUNTER_NAMESPACE = "agent-ready-checker-artem"
@@ -294,7 +296,7 @@ Claude и другим нейросетям находить и правильн
   -> Вставили не в тот шаблон, не сохранили или не опубликовали.
 
 Как проверить, что всё сработало?
-  -> Через 2-3 дня откройте https://agent-ready-checker.onrender.com/
+  -> Через 2-3 дня откройте https://agentreadychecker.ru/
     и проверьте сайт снова. Балл должен вырасти.
 
 -------------------------------------------------------------
@@ -527,5 +529,24 @@ def download_files():
     return send_file(memory_file, download_name="ai-ready-files.zip", as_attachment=True)
 
 
+@app.route("/llms.txt")
+def llms_txt():
+    try:
+        with open("llms.txt", "r", encoding="utf-8") as f:
+            content = f.read()
+    except Exception:
+        content = "# Agent-Ready Checker\n\n> Сервис проверки готовности сайтов к AI-агентам.\n"
+    return content, 200, {"Content-Type": "text/plain; charset=utf-8"}
+
+
+@app.route("/robots.txt")
+def robots_txt():
+    content = ("User-agent: GPTBot\nAllow: /\n\n"
+               "User-agent: ClaudeBot\nAllow: /\n\n"
+               "User-agent: PerplexityBot\nAllow: /\n\n"
+               "User-agent: *\nAllow: /")
+    return content, 200, {"Content-Type": "text/plain; charset=utf-8"}
+
+
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)), debug=False)
